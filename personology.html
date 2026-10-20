@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Personology case study · Vector</title>
+<meta name="description" content="How Vector took Personology, the astro-psychology app, to a 3.0x return on Meta by building the account around Andromeda.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%20width%3D%2264%22%20height%3D%2264%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22f%22%20x1%3D%2213%22%20x2%3D%2245%22%20y1%3D%220%22%20y2%3D%220%22%20gradientUnits%3D%22userSpaceOnUse%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23F5F5F0%22%20stop-opacity%3D%220%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23F5F5F0%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20x%3D%22.5%22%20y%3D%22.5%22%20width%3D%2263%22%20height%3D%2263%22%20rx%3D%2214%22%20fill%3D%22%232563EB%22/%3E%3Cpath%20d%3D%22M20.5%2029L31%2046L41.5%2029%22%20fill%3D%22none%22%20stroke%3D%22%23F5F5F0%22%20stroke-width%3D%227.4%22%20stroke-miterlimit%3D%2210%22/%3E%3Cpath%20d%3D%22M13%2016.5H45%22%20stroke%3D%22url%28%23f%29%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22/%3E%3Ccircle%20cx%3D%2247%22%20cy%3D%2216.5%22%20r%3D%225%22%20fill%3D%22%23F5F5F0%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/vector.css">
+<style>
+/* Personology's world: lavender night, serif voice */
+:root{--cta-glow:rgba(182,164,255,.16);--ink:#0C0A1A;--ink-2:#14112B;--line:#272247;--line-2:#3B3568;--bone:#F1EDFF;--ash:#A9A2CC;--dim:#6F6996;--acc:#B6A4FF;--acc-2:#C6B8FF;--on-accent:#150F33;--nav-bg:rgba(12,10,26,.78);--dimtext:#39325F;--glow:rgba(182,164,255,.55);
+  --fd:"Instrument Serif",Georgia,serif;--lav:#B6A4FF;--rose:#E7B4D6;--peri:#B5CBEF;--lime:#E4FF4A;--gold:#EAD08C;--bad:#F08A9B}
+body{background:radial-gradient(1200px 800px at 85% -10%,rgba(124,106,240,.18),transparent 60%),var(--ink)}
+.stars{position:absolute;inset:0;pointer-events:none;opacity:.6;background-image:radial-gradient(1px 1px at 12% 22%,#fff8,transparent),radial-gradient(1px 1px at 32% 72%,#fff6,transparent),radial-gradient(1.4px 1.4px at 52% 12%,#fff9,transparent),radial-gradient(1px 1px at 72% 42%,#fff6,transparent),radial-gradient(1px 1px at 88% 82%,#fff7,transparent),radial-gradient(1.2px 1.2px at 22% 92%,#fff6,transparent),radial-gradient(1px 1px at 62% 62%,#fff5,transparent),radial-gradient(1px 1px at 92% 18%,#fff8,transparent);background-size:420px 420px}
+
+/* hero */
+.p-hero{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,5fr);gap:24px;align-items:center;min-height:min(820px,88vh)}
+.p-hero .cs-meta{grid-column:1/-1;margin-top:clamp(40px,5vw,72px)}
+.orbit{position:relative;height:clamp(520px,52vw,700px);perspective:1200px}
+.phone{position:absolute;left:50%;top:50%;width:clamp(220px,19vw,268px);aspect-ratio:9/19;transform:translate(-50%,-50%);border-radius:40px;padding:9px;background:linear-gradient(160deg,#3a3460,#16122e);box-shadow:0 60px 120px -40px rgba(80,60,200,.55),0 0 0 1px rgba(255,255,255,.08) inset;z-index:50}
+.scr{position:relative;height:100%;border-radius:32px;overflow:hidden;background:radial-gradient(120% 70% at 50% 0%,#2a2160,#120f28 70%);padding:16px 16px 18px;display:flex;flex-direction:column}
+.isl{width:76px;height:22px;border-radius:12px;background:#05040c;margin:0 auto 12px;flex:none}
+.scr-k{font-size:11px;color:var(--ash);text-align:center;margin:0}
+.orb{width:56%;aspect-ratio:1;margin:14px auto 12px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0,#E8CAFF 12%,#B6A4FF 38%,#6F5BD8 70%,#2B2266 100%);box-shadow:0 0 50px rgba(182,164,255,.55);flex:none}
+.scr-q{font:400 clamp(18px,1.6vw,22px)/1.12 var(--fd);text-align:center;margin:6px 0 0;color:var(--bone)}
+.scr-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin-top:12px}
+.scr-chips span{font-size:10px;padding:5px 8px;border-radius:999px;border:1px solid rgba(182,164,255,.3);color:var(--ash)}
+.scr-btn{margin-top:auto;text-align:center;font-size:12px;font-weight:500;padding:11px;border-radius:999px;background:var(--lime);color:#14152A}
+.ad{position:absolute;left:50%;top:50%;width:clamp(138px,11.5vw,172px);border-radius:14px;background:#191534;border:1px solid rgba(182,164,255,.18);box-shadow:0 24px 50px -20px rgba(0,0,0,.7);overflow:hidden;will-change:transform,opacity}
+.ad-h{display:flex;align-items:center;gap:7px;padding:8px 10px;font-size:10px;line-height:1.2}
+.ad-h i{width:16px;height:16px;border-radius:50%;flex:none;background:radial-gradient(circle at 35% 30%,#fff,#B6A4FF 40%,#5A47C8)}
+.ad-h b{font-weight:500;color:var(--bone)}
+.ad-h small{display:block;color:var(--dim);font-size:9px}
+.ad-img{aspect-ratio:1;display:flex;align-items:flex-end;padding:12px;background:linear-gradient(150deg,var(--g1),var(--g2))}
+.ad-img p{margin:0;font:400 clamp(15px,1.25vw,18px)/1.08 var(--fd);color:#120F28}
+.ad-f{display:flex;justify-content:space-between;padding:7px 10px;font-size:10px;color:var(--ash)}
+.ad-f b{color:var(--lime);font-weight:500;font-family:var(--m)}
+@media (max-width:900px){.p-hero{grid-template-columns:1fr;min-height:0}.orbit{height:560px;margin-top:20px}}
+@media (max-width:600px){.ad{width:118px}.ad-img p{font-size:13px}.ad-f,.ad-h small{display:none}.orbit{height:500px}}
+
+/* the inherited account */
+.acct{margin-top:clamp(56px,7vw,88px)}
+.acct-h{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 24px;border-bottom:1px solid var(--line);font-size:14px;color:var(--ash)}
+.acct-h b{color:var(--bone);font-weight:500}
+.acct table{width:100%;border-collapse:collapse;font-size:15px}
+.acct th{text-align:left;font-weight:400;font-size:13px;color:var(--dim);padding:14px 24px;border-bottom:1px solid var(--line)}
+.acct td{padding:18px 24px;border-bottom:1px solid var(--line);color:var(--ash)}
+.acct td:first-child{color:var(--bone)}
+.acct .num{text-align:right;font-family:var(--m);font-size:14px;white-space:nowrap}
+.acct td.num{color:var(--bad)}
+.acct tr:last-child td{border-bottom:0}
+.acct-f{display:flex;flex-wrap:wrap;gap:10px 28px;padding:16px 24px;border-top:1px solid var(--line);font-size:13px;color:var(--dim)}
+.acct-f b{color:var(--bad);font-weight:500}
+@media (max-width:700px){.acct .tg{display:none}.acct td,.acct th{padding:14px 16px}}
+
+/* audience field */
+.field{position:relative;aspect-ratio:16/7.5}
+@media (max-width:700px){.field{aspect-ratio:4/3.6}}
+.field canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.field-tag{position:absolute;padding:7px 11px;border-radius:8px;font-size:12px;background:rgba(20,17,43,.9);border:1px solid var(--line-2);color:var(--bone);pointer-events:none;transition:opacity .5s var(--e)}
+.field-ctl{display:flex;flex-direction:column;gap:18px;padding:20px 22px;border-top:1px solid var(--line)}
+.seg{display:inline-flex;align-self:flex-start;padding:4px;border-radius:999px;background:var(--ink);border:1px solid var(--line)}
+.seg button{all:unset;cursor:pointer;padding:9px 16px;border-radius:999px;font-size:14px;color:var(--ash);transition:background .5s var(--e),color .4s}
+.seg button[aria-pressed="true"]{background:var(--lav);color:var(--on-accent)}
+.seg button:focus-visible{outline:2px solid var(--lav);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;transition:opacity .5s var(--e)}
+.chips[aria-disabled="true"]{opacity:.35;pointer-events:none}
+.chip{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:8px 13px;border-radius:999px;border:1px solid var(--line-2);font:400 16px/1.1 var(--fd);color:var(--ash);transition:border-color .4s,color .4s,background .4s}
+.chip i{width:8px;height:8px;border-radius:50%;background:var(--c);opacity:.35;transition:opacity .4s}
+.chip[aria-pressed="true"]{color:var(--bone);border-color:var(--c);background:rgba(255,255,255,.03)}
+.chip[aria-pressed="true"] i{opacity:1;box-shadow:0 0 10px var(--c)}
+.chip:focus-visible{outline:2px solid var(--lav);outline-offset:2px}
+.f-stats{display:flex;flex-wrap:wrap;gap:16px 40px}
+.f-stats div{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--ash)}
+.f-stats b{font:500 30px/1 var(--f);letter-spacing:-.04em;color:var(--bone);font-variant-numeric:tabular-nums}
+
+/* creative wall */
+.wall-h{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px 28px;padding:18px 22px;border-bottom:1px solid var(--line);font-size:14px;color:var(--ash)}
+.wall-h b{color:var(--bone);font-weight:500;font-variant-numeric:tabular-nums}
+.wall-h .lime{color:var(--lime)}
+.wall{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:10px;padding:18px}
+.cr{position:relative;aspect-ratio:4/5;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:10px;background:linear-gradient(155deg,var(--g1),var(--g2));transition:opacity .7s var(--e),filter .7s var(--e),transform .8s var(--e),box-shadow .8s var(--e)}
+.cr p{margin:0;font:400 clamp(12px,1vw,15px)/1.08 var(--fd);color:#120F28}
+.cr small{font:500 10px var(--m);color:rgba(18,15,40,.6)}
+.cr .tag{position:absolute;top:8px;right:8px;font:500 10px var(--f);padding:3px 7px;border-radius:999px;opacity:0;transition:opacity .5s}
+.cr.cut{opacity:.16;filter:grayscale(1)}
+.cr.win{box-shadow:0 0 0 2px var(--lime),0 18px 40px -12px rgba(228,255,74,.35);transform:translateY(-3px)}
+.cr.win .tag{opacity:1;background:var(--lime);color:#14152A}
+@media (max-width:900px){.wall{grid-template-columns:repeat(4,minmax(0,1fr))}.cr:nth-child(n+25){display:none}}
+
+/* the app funnel */
+.flow{display:flex;align-items:center;gap:0;margin-top:clamp(56px,7vw,88px);overflow-x:auto;padding:10px 4px 26px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.flow::-webkit-scrollbar{display:none}
+.mini{flex:none;width:clamp(158px,12.3vw,180px);aspect-ratio:9/18.5;border-radius:28px;padding:7px;background:linear-gradient(160deg,#3a3460,#16122e);box-shadow:0 30px 60px -30px rgba(80,60,200,.5)}
+.mini .scr{border-radius:22px;padding:12px 12px 14px;font-size:11px}
+.mini .isl{width:52px;height:15px;margin-bottom:10px}
+.mini h5{margin:0;font:400 19px/1.08 var(--fd);color:var(--bone)}
+.mini .k{font-size:10px;color:var(--ash);margin:0 0 8px}
+.conn{flex:1 0 56px;min-width:56px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 6px;text-align:center}
+.conn i{display:block;width:100%;height:1px;background:linear-gradient(90deg,var(--line-2),var(--lav));transform-origin:left}
+.motion .conn i{transform:scaleX(0)}
+.conn b{font:500 20px/1 var(--f);letter-spacing:-.03em;color:var(--lime);font-variant-numeric:tabular-nums}
+.conn span{font-size:12px;color:var(--ash);line-height:1.3}
+.echo{background:linear-gradient(transparent 62%,rgba(228,255,74,.45) 62%);border-radius:2px;transition:background .6s}
+.feed-img{flex:1;border-radius:10px;display:flex;align-items:flex-end;padding:10px;margin:8px 0;background:linear-gradient(150deg,#E8CAFF,#B5CBEF)}
+.feed-img p{margin:0;font:400 17px/1.06 var(--fd);color:#120F28}
+.feed-cta{display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--ash)}
+.feed-cta span{padding:5px 10px;border-radius:6px;background:var(--lav);color:var(--on-accent);font-weight:500}
+.prog{height:3px;border-radius:2px;background:var(--line);margin:4px 0 14px}
+.prog i{display:block;width:33%;height:100%;border-radius:2px;background:var(--lav)}
+.wheel{flex:1;display:grid;grid-template-columns:1.2fr .8fr 1fr;gap:4px;align-content:center;margin:10px 0;position:relative;font-size:12px;text-align:center;color:var(--dim)}
+.wheel::before{content:"";position:absolute;left:0;right:0;top:50%;height:26px;margin-top:-13px;border-radius:8px;background:rgba(182,164,255,.14)}
+.wheel div{display:flex;flex-direction:column;gap:7px;position:relative}
+.wheel b{font-weight:500;color:var(--bone)}
+.mbtn{text-align:center;font-size:11px;font-weight:500;padding:9px;border-radius:999px;background:var(--lav);color:var(--on-accent)}
+.mbtn.lime{background:var(--lime);color:#14152A}
+.mini .orb{width:50%;margin:8px auto}
+.mini .q{font:400 15px/1.1 var(--fd);text-align:center;color:var(--bone);margin:4px 0 0}
+.plan{border:1px solid var(--line-2);border-radius:10px;padding:8px 10px;margin-top:7px;display:flex;justify-content:space-between;font-size:10.5px;color:var(--ash)}
+.plan b{color:var(--bone);font-weight:500}
+.plan.on{border-color:var(--lime)}
+.plan small{display:block;color:var(--lime);font-size:9px}
+.today{flex:1;border-radius:12px;padding:12px;margin:10px 0;background:linear-gradient(160deg,rgba(231,180,214,.22),rgba(182,164,255,.1));display:flex;flex-direction:column;justify-content:space-between}
+.today p{margin:0;font:400 17px/1.1 var(--fd);color:var(--bone)}
+.today small{font-size:10px;color:var(--ash)}
+.sub-ok{font-size:10px;color:var(--lime);text-align:center}
+
+/* roas chart */
+.roas-wrap{position:relative;padding:clamp(18px,3vw,34px)}
+.roas-read{position:absolute;pointer-events:none;padding:8px 12px;border-radius:8px;background:var(--bone);color:var(--on-accent);font:500 12px var(--m);white-space:nowrap;transform:translate(-50%,calc(-100% - 14px));opacity:0;transition:opacity .25s}
+.roas-read.on{opacity:1}
+.l-with{fill:none;stroke:var(--lav);stroke-width:2.6;stroke-linecap:round}
+.l-before{fill:none;stroke:var(--dim);stroke-width:1.6;stroke-dasharray:4 5}
+.ax{stroke:var(--line);stroke-width:1}
+.lbl{font:500 13px var(--f);fill:var(--ash)}
+.lbl-lime{font:500 14px var(--f);fill:var(--lime)}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Main">
+  <div class="wrap">
+    <a href="./" class="wordmark" aria-label="Vector home"><svg class="wm" width="115" height="30" viewBox="10 12.5 144 37.5" aria-hidden="true"><defs><linearGradient id="nwm" x1="12" x2="46" y1="0" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3B82F6" stop-opacity="0"/><stop offset="1" stop-color="#3B82F6"/></linearGradient></defs><path d="M20.5 26.9L31 43.66L41.5 26.9M49.70 37.10H71.20M68.50 37.10A9.40 9.40 0 1 0 66.09 43.39M93.10 31.06A9.40 9.40 0 1 0 93.10 43.14M103.10 16.6V48.8M96.10 28.10H110.60M133.70 37.10A9.40 9.40 0 1 0 114.90 37.10A9.40 9.40 0 1 0 133.70 37.10ZM141.90 25.4V48.8M141.90 39.10C141.90 29.30 145.40 28.10 151.40 28.10" fill="none" stroke="#F5F5F0" stroke-width="5.4" stroke-miterlimit="10"/><g class="wm-s"><path d="M12 17.5H46" stroke="url(#nwm)" stroke-width="3.4" stroke-linecap="round"/><circle cx="47" cy="17.5" r="4.1" fill="#3B82F6"/></g></svg></a>
+    <div class="nav-links"><a href="./#work">Work</a><a href="tamba.html">Tamba</a><a href="personology.html" aria-current="page">Personology</a><a href="routines.html">Routines</a></div>
+    <a href="./#call" class="btn btn-blue">Book a call</a>
+  </div>
+  <span class="nav-prog"></span>
+</nav>
+
+<!-- Personology figures on this page are placeholders, pitched at roughly top-5% subscription-app benchmarks. Replace with real numbers. -->
+<header class="cs-hero" id="top">
+  <div class="stars" aria-hidden="true"></div>
+  <div class="wrap p-hero">
+    <div>
+      <p class="cs-client" data-hero><i></i>Personology · iOS app</p>
+      <h1 class="cs-h1 js-h1"><span class="l"><span>Painfully</span></span><span class="l"><span>accurate ads.</span></span></h1>
+      <p class="cs-lede" data-hero>How we took Personology, the astro-psychology app, to a 3.0x return on Meta by building the whole account around how Andromeda decides who sees an ad.</p>
+      <div class="cs-res" data-hero><div><b>3.0x</b>Return on ad spend by day 60</div><div><b>214K</b>Installs in nine months</div><div><b>−71%</b>Cost per install</div></div>
+    </div>
+    <div class="orbit" id="orbit" data-hero aria-hidden="true">
+      <div class="phone"><div class="scr">
+        <div class="isl"></div>
+        <p class="scr-k">Your Blueprint</p>
+        <div class="orb"></div>
+        <p class="scr-k">Core wound</p>
+        <p class="scr-q">You act confident, but underneath you're asking: am I enough?</p>
+        <div class="scr-chips"><span>Scorpio sun</span><span>Pisces moon</span><span>INFJ</span></div>
+        <div class="scr-btn">Read your whole Blueprint</div>
+      </div></div>
+    </div>
+    <dl class="cs-meta" data-rv>
+      <div><dt>Client</dt><dd>Personology, the astro-psychology app for iPhone</dd></div>
+      <div><dt>What we did</dt><dd>Meta ads, a weekly creative engine, onboarding and paywall alignment, iOS measurement</dd></div>
+      <div><dt>Timeline</dt><dd>Nine months, ongoing</dd></div>
+      <div><dt>Result</dt><dd>3.0x return on ad spend within 60 days of install</dd></div>
+    </dl>
+  </div>
+</header>
+
+<main>
+<section class="act" id="problem">
+  <div class="wrap">
+    <p class="chap"><b>1</b>The problem</p>
+    <p class="statement" data-brighten>The old playbook was simple: stack interests, find the astrology fans, outbid everyone. By 2025 everyone was bidding on the same people, and Meta had stopped listening to the settings.</p>
+    <div class="panel acct" data-rv>
+      <div class="acct-h"><span><b>The account we inherited</b></span><span>Last 30 days</span></div>
+      <table>
+        <thead><tr><th>Ad set</th><th class="tg">Targeting</th><th class="num">Cost per install</th><th class="num">Return</th></tr></thead>
+        <tbody>
+          <tr><td>Astrology fans, 18–34</td><td class="tg">Interests: astrology, horoscopes</td><td class="num">$4.80</td><td class="num">0.6x</td></tr>
+          <tr><td>Personality test takers</td><td class="tg">Interests: MBTI, personality tests</td><td class="num">$5.35</td><td class="num">0.5x</td></tr>
+          <tr><td>Tarot and spirituality</td><td class="tg">Interests: tarot, spirituality</td><td class="num">$6.20</td><td class="num">0.4x</td></tr>
+          <tr><td>Lookalike, 1%</td><td class="tg">Past installers</td><td class="num">$4.10</td><td class="num">0.7x</td></tr>
+        </tbody>
+      </table>
+      <div class="acct-f"><span>Same 4 creatives running for <b>11 weeks</b></span><span>Average frequency <b>6.2</b></span><span>Optimised for <b>installs</b>, not payers</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="act" id="insight">
+  <div class="wrap">
+    <p class="chap"><b>2</b>The insight</p>
+    <div class="split top">
+      <h2 class="act-h" data-rv>Andromeda reads the ad, not the settings.</h2>
+      <div>
+        <p class="act-p" data-rv style="margin-top:0">Meta's new retrieval engine looks at the image, the words and the landing page, then goes looking for the people they describe. Targeting didn't disappear. It moved into the creative.</p>
+        <p class="act-p" data-rv>So instead of one ad for "astrology fans", we write many ads, each for one specific kind of person, and let the algorithm find each of them.</p>
+      </div>
+    </div>
+    <div class="panel gap-l" id="fieldPanel" data-rv>
+      <div class="field" id="audField"><canvas id="fieldCv" aria-hidden="true"></canvas><div class="field-tag" id="fieldTag">Interests: astrology, women 18–34</div></div>
+      <div class="field-ctl">
+        <div class="seg" role="group" aria-label="Targeting approach"><button type="button" data-mode="interest" aria-pressed="true">Interest targeting</button><button type="button" data-mode="broad" aria-pressed="false">Broad, creative-led</button></div>
+        <div class="chips" id="chips" aria-label="Ad creatives" aria-disabled="true"></div>
+        <div class="f-stats" aria-live="polite"><div><span>Audience the ads can reach</span><b id="fReach">0%</b></div><div><span>Cost per 1,000 views</span><b id="fCpm">$0</b></div></div>
+      </div>
+    </div>
+    <p class="viz-cap">Illustrative. Each dot is a person on Meta. Switch to broad and turn creatives on or off to see who each one finds.</p>
+    <div class="three">
+      <div data-rv><b>Mostly women, 18 to 34</b><p>82% of paying subscribers. They grew up on personality tests and already know their sign.</p></div>
+      <div data-rv><b>They know their big three</b><p>Sun, moon and rising. Naming them in the hook is a signal to the reader and to Meta at once.</p></div>
+      <div data-rv><b>They share what feels true</b><p>One in five screenshots a result. So the best-performing ads look like results, not ads.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="act" id="system">
+  <div class="wrap">
+    <p class="chap"><b>3</b>What we built</p>
+    <div class="split top">
+      <h2 class="act-h" data-rv>A creative engine, not a campaign.</h2>
+      <p class="act-p" data-rv style="margin-top:0">Andromeda tires of ads fast and rewards fresh ones. So we built a weekly rhythm: 40 new concepts every Monday, all running broad, the winners scaled and the rest cut by Friday.</p>
+    </div>
+    <div class="panel gap-l" id="wallPanel">
+      <div class="wall-h"><span>This week's batch</span><span>Concepts tested to date <b data-count="412">412</b></span><span>Scaled <b class="lime" data-count="31">31</b></span><button class="replay" id="wallReplay" type="button"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8a5 5 0 1 0 1.6-3.7M3 2.5v3h3" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>Run the week again</button></div>
+      <div class="wall" id="wall" aria-label="Forty ad concepts; five are scaled, the rest are cut"></div>
+    </div>
+  </div>
+</section>
+
+<section class="act" id="funnel">
+  <div class="wrap">
+    <p class="chap"><b>4</b>The app is the funnel</p>
+    <div class="split top">
+      <h2 class="act-h" data-rv>The ad's promise is the first screen.</h2>
+      <p class="act-p" data-rv style="margin-top:0">An install isn't a customer. We mapped every step from hook to payment, carried the same words from ad to paywall, and told Meta to find people who start trials that convert, not people who download.</p>
+    </div>
+    <div class="flow" id="flow">
+      <div class="mini"><div class="scr"><div class="isl"></div>
+        <div class="feed-cta" style="justify-content:flex-start;gap:6px"><span style="background:none;padding:0;color:var(--bone)">personology</span>Sponsored</div>
+        <div class="feed-img"><p>The one question that reveals your <span class="echo">core wound</span>.</p></div>
+        <div class="feed-cta">Free on the App Store<span>Install</span></div>
+      </div></div>
+      <div class="conn"><b>$1.38</b><i></i><span>per install</span></div>
+      <div class="mini"><div class="scr"><div class="isl"></div>
+        <p class="k">Step 3 of 9</p><div class="prog"><i></i></div>
+        <h5>When were you born?</h5>
+        <div class="wheel"><div><span>October</span><b>November</b><span>December</span></div><div><span>13</span><b>14</b><span>15</span></div><div><span>1997</span><b>1998</b><span>1999</span></div></div>
+        <div class="mbtn">Continue</div>
+      </div></div>
+      <div class="conn"><b>88%</b><i></i><span>finish the quiz</span></div>
+      <div class="mini"><div class="scr"><div class="isl"></div>
+        <p class="k" style="text-align:center">Your <span class="echo">core wound</span></p>
+        <div class="orb"></div>
+        <p class="q">You act confident, but underneath you're asking: am I enough?</p>
+      </div></div>
+      <div class="conn"><b>17%</b><i></i><span>start a free trial</span></div>
+      <div class="mini"><div class="scr"><div class="isl"></div>
+        <h5>Read past your <span class="echo">core wound</span>.</h5>
+        <p class="k" style="margin-top:6px">Your whole Blueprint, every day.</p>
+        <div class="plan on"><span><b>Yearly</b><small>Best value</small></span><b>$49.99</b></div>
+        <div class="plan"><span><b>Weekly</b></span><b>$6.99</b></div>
+        <div style="flex:1"></div>
+        <div class="mbtn lime">Start free trial</div>
+      </div></div>
+      <div class="conn"><b>52%</b><i></i><span>become paying subscribers</span></div>
+      <div class="mini"><div class="scr"><div class="isl"></div>
+        <p class="k">Today</p>
+        <div class="today"><p>You can care deeply without carrying everything.</p><small>Pisces moon in your 4th house</small></div>
+        <p class="sub-ok">Day 7 · Subscribed</p>
+      </div></div>
+    </div>
+    <div class="three">
+      <div data-rv><b>Optimise for trials, not installs</b><p>Meta gets the trial-start event, so it learns who pays, not just who downloads.</p></div>
+      <div data-rv><b>Same words, ad to paywall</b><p>The hook's promise is the first thing the app delivers, so nobody feels baited.</p></div>
+      <div data-rv><b>Measured the iOS way</b><p>SKAdNetwork and Meta's event measurement set up to report trials and payments, not guesses.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="act" id="results">
+  <div class="wrap">
+    <p class="chap"><b>5</b>What happened</p>
+    <h2 class="act-h" data-rv>3.0x, and still climbing.</h2>
+    <div class="panel roas-wrap gap-l" id="roasWrap" data-rv>
+      <svg class="viz" id="roas" viewBox="0 0 960 420" role="img" aria-label="Return on ad spend by days since install. Before Vector, cohorts plateaued at 0.6x. With Vector, they pass breakeven on day 6 and reach 3.0x by day 60."></svg>
+      <div class="roas-read" id="roasRead"></div>
+    </div>
+    <p class="viz-cap">Cumulative return on ad spend for a typical monthly cohort, by days since install. Hover to read any day.</p>
+    <div class="big-nums">
+      <div><b data-count="3" data-dec="1" data-suf="x">3.0x</b><span>Return on ad spend within 60 days of install</span></div>
+      <div><b data-count="214" data-suf="K">214K</b><span>Installs in nine months</span></div>
+      <div><b data-count="71" data-pre="−" data-suf="%">−71%</b><span>Cost per install, from $4.80 to $1.38</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="act">
+  <div class="wrap">
+    <figure class="cs-quote" data-rv>
+      <blockquote>“…it knows so much about me!”</blockquote>
+      <figcaption><b>A Personology user</b>App Store review, Canada</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="act">
+  <div class="wrap">
+    <a class="next next-rout" href="routines.html" data-rv style="--n-acc:#0B9F6B">
+      <span class="next-glow"></span>
+      <small>Next case study</small>
+      <h2>routines.club: number one in health search.</h2>
+      <span class="tile-cta">Read it <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></span>
+    </a>
+  </div>
+</section>
+
+<section class="sec cta" id="call">
+  <div class="wrap cs-cta">
+    <h2 data-rv>Ready to make your ads pay back?</h2>
+    <p class="sub" data-rv>Tell us where you are. We reply within two business days, and if we're not the right fit, we'll say so.</p>
+    <div class="ctas" data-rv><a href="./#call" class="btn btn-blue">Book a 20-minute call <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a><a href="./#work" class="lnk">More work</a></div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-r">
+      <div><a href="./" class="wordmark" aria-label="Vector home"><svg class="wm" width="108" height="28" viewBox="10 12.5 144 37.5" aria-hidden="true"><defs><linearGradient id="fwm" x1="12" x2="46" y1="0" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3B82F6" stop-opacity="0"/><stop offset="1" stop-color="#3B82F6"/></linearGradient></defs><path d="M20.5 26.9L31 43.66L41.5 26.9M49.70 37.10H71.20M68.50 37.10A9.40 9.40 0 1 0 66.09 43.39M93.10 31.06A9.40 9.40 0 1 0 93.10 43.14M103.10 16.6V48.8M96.10 28.10H110.60M133.70 37.10A9.40 9.40 0 1 0 114.90 37.10A9.40 9.40 0 1 0 133.70 37.10ZM141.90 25.4V48.8M141.90 39.10C141.90 29.30 145.40 28.10 151.40 28.10" fill="none" stroke="#F5F5F0" stroke-width="5.4" stroke-miterlimit="10"/><g class="wm-s"><path d="M12 17.5H46" stroke="url(#fwm)" stroke-width="3.4" stroke-linecap="round"/><circle cx="47" cy="17.5" r="4.1" fill="#3B82F6"/></g></svg></a><p style="margin-top:16px">Performance marketing for services firms, apps and content brands. A practice of The Catalyst Act.</p></div>
+      <div class="foot-links"><a href="./#work">Work</a><a href="tamba.html">Tamba</a><a href="personology.html">Personology</a><a href="routines.html">Routines</a><a href="./#faq">FAQ</a></div>
+    </div>
+    <small>© 2026 Vector, by The Catalyst Act</small>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="assets/vector.js"></script>
+<script>
+(function(){
+"use strict";
+const {$,$$,RM,MOTION,svgEl,smooth,onView}=V;
+const PAL=[['#E8CAFF','#B6A4FF'],['#F6D3E7','#E7B4D6'],['#D6E4FA','#B5CBEF'],['#F2FBB8','#E4FF4A'],['#F4E7C2','#EAD08C'],['#E6DDF6','#C9B8F0']];
+let seed=5;const rnd=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646;};
+
+/* ---------- hero: ad creatives orbiting the app ---------- */
+(function(){
+  const st=$('#orbit');if(!st)return;
+  const H=[['For the overthinker who replays every conversation.','46%'],['Why you lose interest once you get what you want.','41%'],['Your attachment style, written in your chart.','38%'],['Scorpio moon? This explains a lot.','44%'],['The one question that reveals your core wound.','49%'],['Why you go quiet when you’re hurt.','36%']];
+  const cards=H.map(([t,m],i)=>{const d=document.createElement('div');d.className='ad';d.style.setProperty('--g1',PAL[i%PAL.length][0]);d.style.setProperty('--g2',PAL[i%PAL.length][1]);
+    d.innerHTML='<div class="ad-h"><i></i><span><b>personology</b><small>Sponsored</small></span></div><div class="ad-img"><p></p></div><div class="ad-f"><span>Hook rate</span><b></b></div>';d.querySelector('p').textContent=t;d.querySelector('.ad-f b').textContent=m;st.appendChild(d);return d;});
+  let a=0,run=true;
+  function place(){const w=st.clientWidth,h=st.clientHeight,rx=Math.min(w*.47,420),ry=h*.36,n=cards.length;
+    cards.forEach((c,i)=>{const t=a+i*Math.PI*2/n,x=Math.cos(t)*rx,y=Math.sin(t)*ry*.55-Math.cos(t*1)*0+Math.sin(t)*0,depth=(Math.sin(t)+1)/2;
+      const s=.72+depth*.34,front=Math.sin(t)>0;
+      c.style.transform='translate(-50%,-50%) translate3d('+x.toFixed(1)+'px,'+(y+Math.cos(t)*ry*.25).toFixed(1)+'px,0) rotate('+(Math.cos(t)*-6).toFixed(2)+'deg) scale('+s.toFixed(3)+')';
+      c.style.zIndex=front?100+Math.round(depth*50):Math.round(depth*40);c.style.opacity=(front?1:.35+depth*.6).toFixed(2);c.style.filter=front?'none':'blur('+((1-depth)*1.6).toFixed(1)+'px)';});}
+  place();
+  if(RM)return;
+  V.whileVisible(st,v=>{run=v;});
+  (function tick(){if(run){a+=.0025;place();}requestAnimationFrame(tick);})();
+  addEventListener('resize',place);
+})();
+
+/* ---------- the audience field ---------- */
+(function(){
+  const cv=$('#fieldCv'),ctx=cv.getContext('2d'),tag=$('#fieldTag'),chipsEl=$('#chips'),reachEl=$('#fReach'),cpmEl=$('#fCpm');
+  const C=[{t:'The overthinker',c:[182,164,255]},{t:'Scorpio moons',c:[231,180,214]},{t:'Anxious attachment',c:[181,203,239]},{t:'The people pleaser',c:[228,255,74]},{t:'Burnt-out INFJs',c:[234,208,140]},{t:'Falls for potential',c:[201,184,240]}];
+  const RECT={x:.07,y:.2,w:.27,h:.38};
+  let W=0,Hh=0,dots=[],mode='interest',on=new Set([0,1,2,3]),vis=false,shown={r:0,c:0};
+  C.forEach((k,i)=>{const b=document.createElement('button');b.type='button';b.className='chip';b.style.setProperty('--c','rgb('+k.c.join(',')+')');b.setAttribute('aria-pressed',on.has(i));b.innerHTML='<i></i>';b.append(k.t);b.addEventListener('click',()=>{if(on.has(i))on.delete(i);else on.add(i);b.setAttribute('aria-pressed',on.has(i));update();});chipsEl.appendChild(b);});
+  function size(){const r=cv.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);W=r.width;Hh=r.height;if(!W)return;cv.width=Math.round(W*dpr);cv.height=Math.round(Hh*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
+    seed=21;C.forEach(k=>{k.b=[0,1,2].map(()=>[.06+rnd()*.88,.08+rnd()*.84]);});
+    const n=Math.min(2600,Math.round(W*Hh/150)),R=Math.min(W,Hh)*.21;const old=dots;dots=[];
+    for(let i=0;i<n;i++){const x=rnd()*W,y=rnd()*Hh;let k=-1,best=1e9;const fz=.55+rnd()*.65;C.forEach((c,ci)=>c.b.forEach(([bx,by])=>{const d=Math.hypot(x-bx*W,y-by*Hh);if(d<best&&d<R*fz){best=d;k=ci;}}));
+      const inR=x>RECT.x*W&&x<(RECT.x+RECT.w)*W&&y>RECT.y*Hh&&y<(RECT.y+RECT.h)*Hh;const o=old[i];dots.push({x,y,k,inR,a:o?o.a:.15,s:o?o.s:1,c:o?o.c.slice():[200,196,232],ph:rnd()*6.28});}
+    tag.style.left=(RECT.x*W+10)+'px';tag.style.top=(RECT.y*Hh-38)+'px';update(true);if(!MOTION||!vis)frame();}
+  function lit(d){return mode==='interest'?d.inR:(d.k>=0&&on.has(d.k));}
+  function update(silent){
+    $$('.seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===mode));
+    chipsEl.setAttribute('aria-disabled',mode==='interest');tag.style.opacity=mode==='interest'?1:0;
+    const n=dots.length||1,hit=dots.filter(lit).length,reach=hit/n;
+    const cpm=mode==='interest'?14.2:Math.max(5.8,10.4-7.2*reach);
+    const tgt={r:reach*100,c:cpm};const paint=()=>{reachEl.textContent=Math.round(shown.r)+'%';cpmEl.textContent='$'+shown.c.toFixed(2);};
+    if(MOTION&&!silent)gsap.to(shown,Object.assign({duration:.9,ease:'expo.out',overwrite:true,onUpdate:paint},tgt));else{Object.assign(shown,tgt);paint();}
+  }
+  let t=0;
+  function frame(){t++;ctx.clearRect(0,0,W,Hh);
+    if(mode==='interest'){ctx.save();ctx.setLineDash([4,5]);ctx.strokeStyle='rgba(182,164,255,.7)';ctx.lineWidth=1.2;ctx.beginPath();ctx.roundRect?ctx.roundRect(RECT.x*W,RECT.y*Hh,RECT.w*W,RECT.h*Hh,10):ctx.rect(RECT.x*W,RECT.y*Hh,RECT.w*W,RECT.h*Hh);ctx.stroke();ctx.restore();}
+    for(const d of dots){const L=lit(d);const col=mode==='interest'?[182,164,255]:(d.k>=0?C[d.k].c:[200,196,232]);const tc=L?col:[200,196,232];
+      d.a+=((L?.95:.17)-d.a)*.08;d.s+=((L?2.1:1.05)-d.s)*.08;for(let j=0;j<3;j++)d.c[j]+=(tc[j]-d.c[j])*.1;
+      const tw=L&&mode==='broad'?Math.sin(t*.04+d.ph)*.15:0;
+      ctx.fillStyle='rgba('+(d.c[0]|0)+','+(d.c[1]|0)+','+(d.c[2]|0)+','+Math.max(0,d.a+tw).toFixed(3)+')';ctx.beginPath();ctx.arc(d.x,d.y,d.s,0,6.283);ctx.fill();}
+    /* name each creative next to the people it found */
+    C.forEach((k,i)=>{k.la=(k.la||0)+(((mode==='broad'&&on.has(i))?1:0)-(k.la||0))*.08;if(k.la<.02)return;const[bx,by]=k.b[0];ctx.font='400 17px "Instrument Serif", Georgia, serif';ctx.fillStyle='rgba('+k.c.join(',')+','+k.la.toFixed(3)+')';const tx=Math.max(8,Math.min(W-150,bx*W-40));ctx.fillText(k.t,tx,Math.max(18,by*Hh-Math.min(W,Hh)*.12));});
+  }
+  $$('.seg button').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;update();if(!MOTION)for(let i=0;i<60;i++)frame();}));
+  size();
+  let auto=false;
+  if(!MOTION){for(let i=0;i<60;i++)frame();}
+  else{(function loop(){if(vis)frame();requestAnimationFrame(loop);})();}
+  V.whileVisible(cv,v=>{vis=v;});
+  onView($('#fieldPanel'),()=>{update();if(!auto){auto=true;setTimeout(()=>{if(mode==='interest'){mode='broad';update();}},2600);}},'0px 0px -35% 0px');
+  let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(size,200);});
+})();
+
+/* ---------- the creative wall ---------- */
+(function(){
+  const wall=$('#wall');
+  const H=['For the overthinker who replays every conversation.','Why you lose interest once you get what you want.','Your attachment style, written in your chart.','Scorpio moon? This explains a lot.','The one question that reveals your core wound.','You’re not too much. You’re a Pisces rising.','Why you attract the same person again.','INFJ with a Leo sun? Read this.','The reason you burn out is in your chart.','Your love language, decoded by your Venus.','Painfully accurate. Slightly rude.','What your moon sign says about how you fight.','Why you go quiet when you’re hurt.','Capricorn energy, explained.','The trait you hide from everyone.','Why you can’t relax, by your birth chart.','Your shadow side, in one screen.','Empath, or just a Cancer?','What your rising sign shows strangers.','Gemini sun, anxious attachment. Hi.','The pattern behind every situationship.','Your career path, according to Saturn.','Why you need to be needed.','The compatibility test your ex failed.','This app read me in 30 seconds.','You crave calm but create chaos?','Why you’re the friend everyone calls.','Aries Mars. Short fuse, big heart.','Your Blueprint, not your horoscope.','What you need in a partner, not what you want.','Virgo moon perfectionism, explained.','Why compliments make you uncomfortable.','The real reason you procrastinate.','You and your mum: a compatibility report.','Your intuition is louder than you think.','Libra rising, people pleaser? Same.','Why you fall for potential.','The wound behind your strength.','Sagittarius sun, commitment issues?','Who you are when nobody’s watching.'];
+  const WIN=[0,4,10,24,36];seed=9;
+  const cells=H.map((t,i)=>{const d=document.createElement('div');d.className='cr';const p=PAL[i%PAL.length];d.style.setProperty('--g1',p[0]);d.style.setProperty('--g2',p[1]);
+    const hk=WIN.includes(i)?44+Math.round(rnd()*8):12+Math.round(rnd()*20);d.innerHTML='<span class="tag">Scaled</span><p></p><small>Hook '+hk+'%</small>';d.querySelector('p').textContent=t;wall.appendChild(d);return d;});
+  let timers=[];
+  function run(){timers.forEach(clearTimeout);timers=[];cells.forEach(c=>c.classList.remove('cut','win'));
+    const order=cells.map((c,i)=>i).filter(i=>!WIN.includes(i)).sort(()=>rnd()-.5);
+    order.forEach((i,k)=>timers.push(setTimeout(()=>cells[i].classList.add('cut'),700+k*70)));
+    WIN.forEach((i,k)=>timers.push(setTimeout(()=>cells[i].classList.add('win'),700+order.length*70+200+k*160)));}
+  if(!MOTION){cells.forEach((c,i)=>c.classList.add(WIN.includes(i)?'win':'cut'));$('#wallReplay').hidden=true;return;}
+  onView(wall,run,'0px 0px -30% 0px');$('#wallReplay').addEventListener('click',run);
+})();
+
+/* ---------- the app funnel: connectors draw in ---------- */
+if(MOTION)onView($('#flow'),()=>gsap.to('.conn i',{scaleX:1,duration:1.2,ease:'expo.out',stagger:.35}),'0px 0px -25% 0px');
+
+/* ---------- cohort ROAS ---------- */
+(function(){
+  const svg=$('#roas'),read=$('#roasRead'),wrap=$('#roasWrap');const L=60,R=850,T=30,B=370,MAXY=3.5,D=60;
+  const sig=x=>1/(1+Math.exp(-x));
+  const withV=d=>.1+1.25*sig((d-5)/1.2)+1.65*Math.pow(d/D,.9),before=d=>.05+.4*sig((d-5)/1.2)+.15*Math.pow(d/D,.9);
+  const x=d=>L+(R-L)*d/D,y=v=>B-(B-T)*v/MAXY;
+  [0,1,2,3].forEach(v=>{svgEl('line',{class:'ax',x1:L,x2:R,y1:y(v),y2:y(v),'stroke-dasharray':v===0?'':'2 5'},svg);const t=svgEl('text',{class:'tick',x:L-12,y:y(v)+4,'text-anchor':'end'},svg);t.textContent=v+'.0x';});
+  [0,7,14,30,45,60].forEach(d=>{const t=svgEl('text',{class:'tick',x:x(d),y:B+26,'text-anchor':'middle'},svg);t.textContent='Day '+d;});
+  svgEl('line',{x1:L,x2:R,y1:y(1),y2:y(1),stroke:'#E4FF4A','stroke-opacity':.5,'stroke-dasharray':'4 5'},svg);
+  const be=svgEl('text',{class:'tick',x:R,y:y(1)-10,'text-anchor':'end'},svg);be.textContent='Breakeven';be.setAttribute('fill','#E4FF4A');
+  const P=[],Q=[];for(let d=0;d<=D;d+=.5){P.push([x(d),y(withV(d))]);Q.push([x(d),y(before(d))]);}
+  const toD=a=>'M '+a.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L ');
+  const defs=svgEl('defs',{},svg);defs.innerHTML='<linearGradient id="lavA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B6A4FF" stop-opacity=".3"/><stop offset="1" stop-color="#B6A4FF" stop-opacity="0"/></linearGradient><clipPath id="roasClip"><rect id="roasClipR" x="'+L+'" y="0" width="'+(R-L)+'" height="'+(B+2)+'"/></clipPath>';
+  const area=svgEl('path',{d:toD(P)+' L '+R+' '+B+' L '+L+' '+B+' Z',fill:'url(#lavA)','clip-path':'url(#roasClip)'},svg);
+  const pb=svgEl('path',{class:'l-before',d:toD(Q),'clip-path':'url(#roasClip)'},svg);
+  const pw=svgEl('path',{class:'l-with',d:toD(P),'clip-path':'url(#roasClip)'},svg);
+  const bx=x(5.4);const mk=svgEl('g',{},svg);svgEl('circle',{cx:bx,cy:y(1),r:6,fill:'#E4FF4A'},mk);
+  const mt=svgEl('text',{class:'lbl-lime',x:bx+14,y:y(1)+26},mk);mt.textContent='Paid back on day 6';
+  const e1=svgEl('text',{class:'lbl-lime',x:R+12,y:y(3)+5},svg);e1.textContent='3.0x';
+  const e2=svgEl('text',{class:'lbl',x:R+12,y:y(.6)+5},svg);e2.textContent='0.6x before';
+  const hl=svgEl('line',{x1:0,x2:0,y1:T,y2:B,stroke:'#F1EDFF','stroke-opacity':.25,opacity:0},svg),hd=svgEl('circle',{r:5,fill:'#F1EDFF',opacity:0},svg);
+  /* both lines are revealed left to right by one clip when the chart arrives */
+  if(MOTION){const cr=$('#roasClipR');cr.setAttribute('width',0);
+    const o={p:0};gsap.to(o,{p:1,duration:2.4,ease:'power2.inOut',scrollTrigger:{trigger:svg,start:'top 70%',once:true},onUpdate:()=>{cr.setAttribute('width',(R-L+4)*o.p);},onComplete:()=>gsap.to([e2,e1],{opacity:1,duration:.8,stagger:.2})});
+    gsap.set([mk,e1,e2],{opacity:0});
+    ScrollTrigger.create({trigger:svg,start:'top 70%',once:true,onEnter:()=>gsap.to(mk,{opacity:1,duration:.8,delay:.6})});}
+  svg.addEventListener('pointermove',e=>{const r=svg.getBoundingClientRect(),sc=r.width/960,px=(e.clientX-r.left)/sc;const d=Math.max(0,Math.min(D,Math.round((px-L)/(R-L)*D)));const v=withV(d);
+    hl.setAttribute('x1',x(d));hl.setAttribute('x2',x(d));hl.setAttribute('opacity',1);hd.setAttribute('cx',x(d));hd.setAttribute('cy',y(v));hd.setAttribute('opacity',1);
+    const wr=wrap.getBoundingClientRect();read.style.left=(r.left-wr.left+x(d)*sc)+'px';read.style.top=(r.top-wr.top+y(v)*sc)+'px';read.textContent='Day '+d+' · '+v.toFixed(2)+'x (before: '+before(d).toFixed(2)+'x)';read.classList.add('on');});
+  svg.addEventListener('pointerleave',()=>{hl.setAttribute('opacity',0);hd.setAttribute('opacity',0);read.classList.remove('on');});
+})();
+})();
+</script>
+</body>
+</html>

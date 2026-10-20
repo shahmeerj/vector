@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>routines.club case study · Vector</title>
+<meta name="description" content="How Vector made routines.club number one in the world for health routines search.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Instrument+Serif&display=swap">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%20width%3D%2264%22%20height%3D%2264%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22f%22%20x1%3D%2213%22%20x2%3D%2245%22%20y1%3D%220%22%20y2%3D%220%22%20gradientUnits%3D%22userSpaceOnUse%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23F5F5F0%22%20stop-opacity%3D%220%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23F5F5F0%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20x%3D%22.5%22%20y%3D%22.5%22%20width%3D%2263%22%20height%3D%2263%22%20rx%3D%2214%22%20fill%3D%22%232563EB%22/%3E%3Cpath%20d%3D%22M20.5%2029L31%2046L41.5%2029%22%20fill%3D%22none%22%20stroke%3D%22%23F5F5F0%22%20stroke-width%3D%227.4%22%20stroke-miterlimit%3D%2210%22/%3E%3Cpath%20d%3D%22M13%2016.5H45%22%20stroke%3D%22url%28%23f%29%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22/%3E%3Ccircle%20cx%3D%2247%22%20cy%3D%2216.5%22%20r%3D%225%22%20fill%3D%22%23F5F5F0%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/vector.css">
+<style>
+/* routines.club's world: morning light */
+:root{--cta-glow:rgba(25,181,126,.14);--ink:#07120E;--ink-2:#0D1A14;--line:#1C2E25;--line-2:#2A4136;--bone:#ECF3EE;--ash:#9DB2A6;--dim:#6A8174;--acc:#19B57E;--acc-2:#2FD08F;--on-accent:#04110B;--nav-bg:rgba(7,18,14,.8);--dimtext:#2A3D33;--glow:rgba(25,181,126,.4);--em:#19B57E;--deep:#5BD6A4;--sun:#FFB23F;--mist:#1A2A22}
+/* the morning light lives inside the mocks and charts */
+.serp,.panel{color-scheme:light;--ink:#EEF3EC;--ink-2:#FFFFFF;--line:#D7DFD4;--line-2:#BCC8B9;--bone:#0E1F18;--ash:#4E6057;--dim:#7B8A82;--em:#0B9F6B;--deep:#0A7A52;--mist:#E3EAE1;color:var(--bone)}
+.panel{background:#F7FAF6;border-color:#D7DFD4}
+.cs-h1{max-width:none}
+.cs-hero::before{content:"";position:absolute;left:50%;top:-30vw;width:110vw;height:70vw;transform:translateX(-50%);border-radius:50%;background:radial-gradient(closest-side,rgba(255,178,63,.12),rgba(255,178,63,0));pointer-events:none}
+.panel{box-shadow:0 30px 60px -40px rgba(14,31,24,.25)}
+
+/* hero SERP */
+.serp{display:grid;grid-template-columns:minmax(0,8fr) minmax(0,4fr);margin:clamp(56px,7vw,88px) 0 clamp(48px,6vw,80px);background:#fff;border-radius:22px;box-shadow:0 40px 90px -40px rgba(14,31,24,.35),0 0 0 1px rgba(14,31,24,.06);overflow:hidden}
+.serp-main{padding:clamp(18px,2.6vw,30px);border-right:1px solid var(--line);min-width:0}
+.sbar{display:flex;align-items:center;gap:12px;height:54px;padding:0 20px;border-radius:999px;border:1px solid var(--line);box-shadow:0 2px 10px -4px rgba(14,31,24,.12);font-size:17px}
+.sbar svg{flex:none;color:var(--dim)}
+.sq{white-space:nowrap;overflow:hidden;text-overflow:clip}
+.caret{width:1.5px;height:22px;background:var(--em);animation:blink 1s steps(1) infinite;flex:none}
+@keyframes blink{50%{opacity:0}}
+.stabs{display:flex;gap:22px;padding:14px 8px 0;font-size:13px;color:var(--dim);border-bottom:1px solid var(--line)}
+.stabs span{padding-bottom:12px}
+.stabs span:first-child{color:var(--bone);box-shadow:inset 0 -2px 0 var(--em)}
+.sres{position:relative;margin-top:18px;min-height:360px}
+.sres > *{transition:opacity .5s var(--e),transform .8s var(--e)}
+.sres.wait > *{opacity:0;transform:translateY(12px)}
+.aio{border-radius:14px;padding:14px 16px;background:linear-gradient(135deg,#F2F7F1,#EAF2F4)}
+.aio-k{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500}
+.aio i{display:block;height:8px;border-radius:4px;background:#D9E3DA;margin-top:9px}
+.src{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.src span{font-size:12px;padding:5px 10px;border-radius:999px;border:1px solid var(--line);color:var(--dim)}
+.src span.me{border-color:var(--em);color:var(--deep);background:rgba(11,159,107,.07);font-weight:500}
+.r{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid #EEF2EC}
+.r:last-child{border-bottom:0}
+.rk{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font:600 12px var(--f);background:var(--mist);color:var(--dim)}
+.r.me .rk{background:var(--em);color:#fff;box-shadow:0 0 0 5px rgba(11,159,107,.14)}
+.r small{display:block;font-size:12px;color:var(--dim)}
+.r b{display:block;font-weight:500;font-size:18px;line-height:1.3;color:var(--deep);margin-top:3px;letter-spacing:-.01em}
+.r p{margin:5px 0 0;font-size:14px;color:var(--ash);line-height:1.5}
+.r.g div{flex:1;display:flex;flex-direction:column;gap:8px;padding-top:4px}
+.r.g i{display:block;height:9px;border-radius:5px;background:var(--mist)}
+.serp-side{display:flex;flex-direction:column;justify-content:space-between;gap:24px;padding:clamp(18px,2.6vw,30px);background:linear-gradient(180deg,#FBFDFB,#F4F8F3)}
+.serp-side small{font-size:13px;color:var(--dim)}
+.rank-big{font:500 clamp(96px,11vw,170px)/.85 var(--f);letter-spacing:-.07em;color:var(--em);font-variant-numeric:tabular-nums;margin-top:10px}
+.rank-big span{font-size:.45em;letter-spacing:-.03em;vertical-align:.95em;margin-right:4px;color:var(--deep)}
+.spark{width:100%;height:auto;display:block;overflow:visible}
+.spark path{fill:none;stroke:var(--em);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.spark-note{font-size:13px;color:var(--ash);margin:8px 0 0}
+@media (max-width:860px){.serp{grid-template-columns:1fr}.serp-main{border-right:0;border-bottom:1px solid var(--line)}.sres{min-height:330px}.sbar{font-size:15px}.serp-side{flex-direction:row;align-items:end}.serp-side > div{flex:1}.rank-big{font-size:84px}.sres{min-height:300px}.r b{font-size:16px}}
+
+/* the authority wall */
+.auth{padding:clamp(10px,2vw,20px) clamp(18px,3vw,36px)}
+.au{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,7fr) 48px;gap:20px;align-items:center;padding:16px 0;border-bottom:1px solid var(--line);font-size:15px}
+.au:last-child{border-bottom:0}
+.au span{color:var(--ash)}
+.au i{display:block;height:12px;border-radius:6px;background:var(--mist);overflow:hidden}
+.au i b{display:block;height:100%;width:var(--w);border-radius:6px;background:#9AA79F;transform-origin:left}
+.motion .au i b{transform:scaleX(0)}
+.au em{font:500 15px var(--m);font-style:normal;text-align:right;color:var(--ash)}
+.au.me span{color:var(--bone);font-weight:500}
+.au.me i b{background:var(--em)}
+.au.me em{color:var(--em)}
+@media (max-width:600px){.au{grid-template-columns:minmax(0,1fr) 40px;gap:8px 12px}.au i{grid-column:1/-1;order:3}}
+
+/* article vs routine */
+.vs{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(20px,3vw,40px);margin-top:clamp(56px,7vw,88px);align-items:start}
+.vs h3{font-size:14px;font-weight:500;color:var(--dim);margin:0 0 16px}
+.vs .them h3{color:var(--dim)}
+.vs .us h3{color:var(--em)}
+.article{padding:26px;opacity:.9}
+.article i{display:block;height:9px;border-radius:5px;background:var(--mist);margin-top:11px}
+.article .t{height:18px;width:80%;background:#D6DED3;margin-top:0}
+.article .img{height:120px;border-radius:10px;margin:18px 0 8px}
+.article .ad{height:60px;border-radius:8px;margin:18px 0 6px;background:repeating-linear-gradient(45deg,#F1F4EF,#F1F4EF 8px,#E8EDE6 8px,#E8EDE6 16px);display:grid;place-items:center;font:500 11px var(--m);color:var(--dim)}
+.article-note{margin-top:20px;padding-top:16px;border-top:1px solid var(--line);font-size:14px;color:var(--ash)}
+.routine{padding:26px}
+.ro-h{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.ro-h h4{margin:0;font-size:22px;font-weight:500;letter-spacing:-.025em;line-height:1.2}
+.ro-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.ro-meta span{font-size:12px;padding:5px 10px;border-radius:999px;background:var(--mist);color:var(--ash)}
+.ro-meta span.rv{background:rgba(11,159,107,.1);color:var(--deep)}
+.steps-r{position:relative;margin-top:22px;padding-left:26px}
+.steps-r::before{content:"";position:absolute;left:6px;top:8px;bottom:8px;width:2px;background:var(--mist)}
+.steps-r .fill{position:absolute;left:6px;top:8px;width:2px;height:calc(100% - 16px);background:linear-gradient(var(--sun),var(--em));transform-origin:top}
+.motion .steps-r .fill{transform:scaleY(0)}
+.st{position:relative;display:grid;grid-template-columns:56px 1fr;gap:10px;padding:10px 0}
+.st::before{content:"";position:absolute;left:-25px;top:15px;width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid var(--line-2);transition:border-color .5s,background .5s}
+.st.on::before{border-color:var(--em);background:var(--em)}
+.st time{font:500 13px var(--m);color:var(--dim);padding-top:2px}
+.st b{display:block;font-weight:500;font-size:15px}
+.st span{display:block;font-size:13px;color:var(--ash);margin-top:2px}
+.ro-btn{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:20px;padding:13px;border-radius:12px;background:var(--bone);color:#fff;font-size:14px;font-weight:500}
+.vs-stats{display:flex;flex-wrap:wrap;gap:16px 48px;margin-top:clamp(36px,4vw,56px);padding-top:24px;border-top:1px solid var(--line)}
+.vs-stats div{display:flex;flex-direction:column;gap:8px;font-size:14px;color:var(--ash)}
+.vs-stats b{font:500 clamp(30px,3vw,42px)/1 var(--f);letter-spacing:-.04em;color:var(--bone);font-variant-numeric:tabular-nums}
+.vs-stats s{text-decoration:none;color:var(--dim);font-size:.5em;letter-spacing:0;margin-left:6px}
+@media (max-width:860px){.vs{grid-template-columns:1fr}}
+
+/* topic map */
+.map{position:relative;aspect-ratio:16/9}
+.map canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.map-hud{position:absolute;left:clamp(16px,2.4vw,28px);top:clamp(16px,2.4vw,24px);display:flex;gap:28px;pointer-events:none}
+.map-hud div{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--dim)}
+.map-hud b{font:500 clamp(22px,2.4vw,32px)/1 var(--f);letter-spacing:-.04em;color:var(--bone);font-variant-numeric:tabular-nums}
+.map-tip{position:absolute;pointer-events:none;padding:9px 13px;border-radius:8px;background:var(--bone);color:#fff;font-size:13px;line-height:1.4;white-space:nowrap;transform:translate(-50%,calc(-100% - 18px));opacity:0;transition:opacity .25s}
+.map-tip.on{opacity:1}
+.map-tip b{font-weight:500}
+@media (max-width:700px){.map{aspect-ratio:4/4.4}}
+
+/* traffic chart */
+.tr-wrap{position:relative;padding:clamp(18px,3vw,34px)}
+.tr-line{fill:none;stroke:var(--em);stroke-width:2.6;stroke-linejoin:round}
+.ms circle{fill:#fff;stroke:var(--em);stroke-width:2}
+.ms text{font:500 12px var(--f);fill:var(--ash)}
+.ms line{stroke:var(--line-2);stroke-dasharray:2 3}
+.tr-read{position:absolute;pointer-events:none;padding:8px 12px;border-radius:8px;background:var(--bone);color:#fff;font:500 12px var(--m);white-space:nowrap;transform:translate(-50%,calc(-100% - 14px));opacity:0;transition:opacity .25s}
+.tr-read.on{opacity:1}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Main">
+  <div class="wrap">
+    <a href="./" class="wordmark" aria-label="Vector home"><svg class="wm" width="115" height="30" viewBox="10 12.5 144 37.5" aria-hidden="true"><defs><linearGradient id="nwm" x1="12" x2="46" y1="0" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3B82F6" stop-opacity="0"/><stop offset="1" stop-color="#3B82F6"/></linearGradient></defs><path d="M20.5 26.9L31 43.66L41.5 26.9M49.70 37.10H71.20M68.50 37.10A9.40 9.40 0 1 0 66.09 43.39M93.10 31.06A9.40 9.40 0 1 0 93.10 43.14M103.10 16.6V48.8M96.10 28.10H110.60M133.70 37.10A9.40 9.40 0 1 0 114.90 37.10A9.40 9.40 0 1 0 133.70 37.10ZM141.90 25.4V48.8M141.90 39.10C141.90 29.30 145.40 28.10 151.40 28.10" fill="none" stroke="#F5F5F0" stroke-width="5.4" stroke-miterlimit="10"/><g class="wm-s"><path d="M12 17.5H46" stroke="url(#nwm)" stroke-width="3.4" stroke-linecap="round"/><circle cx="47" cy="17.5" r="4.1" fill="#3B82F6"/></g></svg></a>
+    <div class="nav-links"><a href="./#work">Work</a><a href="tamba.html">Tamba</a><a href="personology.html">Personology</a><a href="routines.html" aria-current="page">Routines</a></div>
+    <a href="./#call" class="btn btn-blue">Book a call</a>
+  </div>
+  <span class="nav-prog"></span>
+</nav>
+
+<!-- routines.club figures and the "number one" claim are placeholders. Confirm against Search Console / rank-tracking data before publishing. -->
+<header class="cs-hero" id="top">
+  <div class="wrap">
+    <p class="cs-client" data-hero><i></i>routines.club · Health and wellness</p>
+    <h1 class="cs-h1 js-h1"><span class="l"><span>Number one</span></span><span class="l"><span>in the world for</span></span><span class="l"><span>health routines.</span></span></h1>
+    <p class="cs-lede" data-hero>How Vector made routines.club the most-visited health routines site on the internet, by building every page around what people are actually trying to do with their day.</p>
+      <div class="cs-res" data-hero><div><b>3.1M</b>Organic visits a month</div><div><b>11,482</b>Searches ranked first</div><div><b>$4.2M</b>Monthly value in search-ad terms</div></div>
+    <div class="serp" id="serp" data-hero aria-hidden="true">
+      <div class="serp-main">
+        <div class="sbar"><svg width="18" height="18" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.5"/></svg><span class="sq" id="sq"></span><i class="caret"></i></div>
+        <div class="stabs"><span>All</span><span>Images</span><span>Videos</span><span>News</span><span>Shopping</span></div>
+        <div class="sres wait" id="sres">
+          <div class="aio"><div class="aio-k"><svg width="14" height="14" viewBox="0 0 16 16"><path d="M8 1l1.6 4.4L14 7l-4.4 1.6L8 13l-1.6-4.4L2 7l4.4-1.6z" fill="#0B9F6B"/></svg>AI overview</div><i style="width:94%"></i><i style="width:88%"></i><i style="width:60%"></i><div class="src"><span class="me">routines.club</span><span>2 more sources</span></div></div>
+          <div class="r me"><span class="rk">1</span><div><small id="surl">routines.club › huberman</small><b id="stitle"></b><p>Step by step, with timings and the reason behind every habit. Reviewed by a physician.</p></div></div>
+          <div class="r g"><span class="rk">2</span><div><i style="width:30%"></i><i style="width:82%"></i><i style="width:64%"></i></div></div>
+          <div class="r g"><span class="rk">3</span><div><i style="width:24%"></i><i style="width:74%"></i><i style="width:58%"></i></div></div>
+        </div>
+      </div>
+      <div class="serp-side">
+        <div><small>Position for this search</small><div class="rank-big"><span>#</span><b id="rankN" style="font-weight:inherit">1</b></div></div>
+        <div><svg class="spark" viewBox="0 0 240 96"><path id="spark"/></svg><p class="spark-note" id="sparkNote">Was #14 eighteen months ago</p></div>
+      </div>
+    </div>
+    <dl class="cs-meta" data-rv>
+      <div><dt>Client</dt><dd>routines.club, the daily routines of the people who live longest and perform best</dd></div>
+      <div><dt>What we did</dt><dd>SEO strategy, topic mapping, content system, technical SEO, expert review</dd></div>
+      <div><dt>Timeline</dt><dd>24 months, ongoing</dd></div>
+      <div><dt>Result</dt><dd>3.1M organic visits a month, first for 11,482 searches</dd></div>
+    </dl>
+  </div>
+</header>
+
+<main>
+<section class="act" id="problem">
+  <div class="wrap">
+    <p class="chap"><b>1</b>The problem</p>
+    <p class="statement" data-brighten>Health is the hardest search on the internet. Google holds it to its strictest standard, and page one belongs to hospital networks and publishers a thousand times our size.</p>
+    <div class="panel auth gap-l" id="auth" data-rv>
+      <div class="au"><span>Hospital network</span><i><b style="--w:94%"></b></i><em>94</em></div>
+      <div class="au"><span>Government health agency</span><i><b style="--w:93%"></b></i><em>93</em></div>
+      <div class="au"><span>Medical encyclopedia</span><i><b style="--w:91%"></b></i><em>91</em></div>
+      <div class="au"><span>Health media group</span><i><b style="--w:90%"></b></i><em>90</em></div>
+      <div class="au"><span>Pharmacy chain</span><i><b style="--w:86%"></b></i><em>86</em></div>
+      <div class="au me"><span>routines.club, when we started</span><i><b style="--w:21%"></b></i><em>21</em></div>
+    </div>
+    <p class="viz-cap">Typical authority scores on page one for health searches, against routines.club on day one. Scale of 0 to 100.</p>
+  </div>
+</section>
+
+<section class="act" id="insight">
+  <div class="wrap">
+    <p class="chap"><b>2</b>The insight</p>
+    <div class="split top">
+      <h2 class="act-h" data-rv>Nobody searches for health. They search for a day.</h2>
+      <div>
+        <p class="act-p" data-rv style="margin-top:0">People don't want 3,000 words on cortisol. They want to know what to do at 6 a.m. tomorrow.</p>
+        <p class="act-p" data-rv>So we stopped publishing articles and started publishing routines: timed, step by step, and checked by experts. The format is the brand, and it's exactly what the searcher came for.</p>
+      </div>
+    </div>
+    <div class="vs">
+      <div class="them" data-rv>
+        <h3>What usually ranks</h3>
+        <div class="panel article" aria-hidden="true">
+          <i class="t"></i><i style="width:40%"></i><i class="img"></i>
+          <i style="width:96%"></i><i style="width:92%"></i><i style="width:98%"></i><i style="width:70%"></i>
+          <div class="ad">ADVERTISEMENT</div>
+          <i style="width:94%"></i><i style="width:97%"></i><i style="width:88%"></i><i style="width:91%"></i><i style="width:64%"></i>
+          <div class="ad">ADVERTISEMENT</div>
+          <i style="width:93%"></i><i style="width:80%"></i>
+          <p class="article-note">3,200 words. The answer is in paragraph nine.</p>
+        </div>
+      </div>
+      <div class="us" data-rv>
+        <h3>What routines.club publishes</h3>
+        <div class="panel routine" id="routine">
+          <div class="ro-h"><h4>Andrew Huberman's morning routine</h4></div>
+          <div class="ro-meta"><span>6 steps</span><span>90 minutes</span><span class="rv">Reviewed by a sleep physician</span></div>
+          <div class="steps-r"><span class="fill" id="roFill"></span>
+            <div class="st"><time>06:00</time><div><b>Wake at the same time</b><span>Anchors your body clock.</span></div></div>
+            <div class="st"><time>06:05</time><div><b>10 minutes of outdoor light</b><span>Sets alertness for the whole day.</span></div></div>
+            <div class="st"><time>06:20</time><div><b>Water with a pinch of salt</b><span>Rehydrates after sleep.</span></div></div>
+            <div class="st"><time>06:30</time><div><b>Zone 2 cardio, 30 minutes</b><span>Builds your aerobic base.</span></div></div>
+            <div class="st"><time>07:10</time><div><b>Cold shower, 1 to 3 minutes</b><span>A clean, lasting lift in energy.</span></div></div>
+            <div class="st"><time>07:30</time><div><b>First coffee</b><span>Delayed 90 minutes after waking.</span></div></div>
+          </div>
+          <div class="ro-btn"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.6"/></svg>Add to my morning</div>
+        </div>
+      </div>
+    </div>
+    <div class="vs-stats">
+      <div>Time on page<b>4:38<s>vs 1:12 typical</s></b></div>
+      <div>Readers who come back within a week<b>38%<s>vs 9% typical</s></b></div>
+      <div>Pages saved to a reader's routine<b>1.2M</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="act" id="system">
+  <div class="wrap">
+    <p class="chap"><b>3</b>What we built</p>
+    <div class="split top">
+      <h2 class="act-h" data-rv>A map of 14,000 questions.</h2>
+      <p class="act-p" data-rv style="margin-top:0">We grouped every routine-shaped question people ask into nine topics, then built a page to own each one. Internal links carry authority from the strongest topics to the newest pages, so fresh pages rank in weeks, not months.</p>
+    </div>
+    <div class="panel gap-l" data-rv>
+      <div class="map" id="map">
+        <canvas id="mapCv" role="img" aria-label="Topic map: nine topic hubs, from celebrity routines and sleep to skincare and focus, growing from 40 to 1,940 pages."></canvas>
+        <div class="map-hud"><div>Pages live<b id="mapPages">40</b></div><div>Topics<b>9</b></div></div>
+        <div class="map-tip" id="mapTip"></div>
+      </div>
+    </div>
+    <p class="viz-cap">The site grows as you scroll, from 40 pages to 1,940. Hover a topic to see what it brings in.</p>
+    <div class="three">
+      <div data-rv><b>Checked by experts</b><p>Every health page is reviewed by a credentialed expert, named on the page. That's what Google looks for in health.</p></div>
+      <div data-rv><b>Fast and structured</b><p>Pages load in under a second, with structured data so search engines and AI tools read each step correctly.</p></div>
+      <div data-rv><b>Built to be cited</b><p>Clear, sourced routines are exactly what AI answers quote. routines.club shows up in them every day.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="act" id="results">
+  <div class="wrap">
+    <p class="chap"><b>4</b>What happened</p>
+    <h2 class="act-h" data-rv>From 38,000 visits a month to 3.1 million.</h2>
+    <div class="panel tr-wrap gap-l" id="trWrap" data-rv>
+      <svg class="viz" id="traffic" viewBox="0 0 960 420" role="img" aria-label="Monthly organic visits grew from 38,000 to 3.1 million over 24 months."></svg>
+      <div class="tr-read" id="trRead"></div>
+    </div>
+    <p class="viz-cap">Monthly organic visits over 24 months. Hover to read any month.</p>
+    <div class="big-nums">
+      <div><b data-count="3.1" data-dec="1" data-suf="M">3.1M</b><span>Organic visits a month, worldwide</span></div>
+      <div><b data-count="11482">11,482</b><span>Searches where routines.club ranks first</span></div>
+      <div><b data-count="4.2" data-dec="1" data-pre="$" data-suf="M">$4.2M</b><span>What that traffic would cost each month in search ads</span></div>
+    </div>
+    <div class="three">
+      <div data-rv><b>Cited by AI answers</b><p>More than 2,300 citations across AI Overviews, ChatGPT and Perplexity.</p></div>
+      <div data-rv><b>Brand searches up 9x</b><p>People now search for routines.club by name, the clearest sign the brand is landing.</p></div>
+      <div data-rv><b>184,000 newsletter readers</b><p>Search traffic turned into an audience the brand owns outright.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="act">
+  <div class="wrap">
+    <figure class="cs-quote" data-rv>
+      <!-- Placeholder quote: replace with the founder's own words. -->
+      <blockquote>“Vector didn't chase keywords. They worked out what our readers were trying to do with their day, and built the whole site around it.”</blockquote>
+      <figcaption><b>Founder</b>routines.club</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="act">
+  <div class="wrap">
+    <a class="next next-tamba" href="tamba.html" data-rv style="--n-acc:#E9B949">
+      <span class="next-glow"></span>
+      <small>Next case study</small>
+      <h2>Tamba: ads that end in a handshake.</h2>
+      <span class="tile-cta">Read it <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></span>
+    </a>
+  </div>
+</section>
+
+<section class="sec cta" id="call">
+  <div class="wrap cs-cta">
+    <h2 data-rv>Want to own your search results?</h2>
+    <p class="sub" data-rv>Tell us where you are. We reply within two business days, and if we're not the right fit, we'll say so.</p>
+    <div class="ctas" data-rv><a href="./#call" class="btn btn-blue">Book a 20-minute call <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a><a href="./#work" class="lnk">More work</a></div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-r">
+      <div><a href="./" class="wordmark" aria-label="Vector home"><svg class="wm" width="108" height="28" viewBox="10 12.5 144 37.5" aria-hidden="true"><defs><linearGradient id="fwm" x1="12" x2="46" y1="0" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3B82F6" stop-opacity="0"/><stop offset="1" stop-color="#3B82F6"/></linearGradient></defs><path d="M20.5 26.9L31 43.66L41.5 26.9M49.70 37.10H71.20M68.50 37.10A9.40 9.40 0 1 0 66.09 43.39M93.10 31.06A9.40 9.40 0 1 0 93.10 43.14M103.10 16.6V48.8M96.10 28.10H110.60M133.70 37.10A9.40 9.40 0 1 0 114.90 37.10A9.40 9.40 0 1 0 133.70 37.10ZM141.90 25.4V48.8M141.90 39.10C141.90 29.30 145.40 28.10 151.40 28.10" fill="none" stroke="#F5F5F0" stroke-width="5.4" stroke-miterlimit="10"/><g class="wm-s"><path d="M12 17.5H46" stroke="url(#fwm)" stroke-width="3.4" stroke-linecap="round"/><circle cx="47" cy="17.5" r="4.1" fill="#3B82F6"/></g></svg></a><p style="margin-top:16px">Performance marketing for services firms, apps and content brands. A practice of The Catalyst Act.</p></div>
+      <div class="foot-links"><a href="./#work">Work</a><a href="tamba.html">Tamba</a><a href="personology.html">Personology</a><a href="routines.html">Routines</a><a href="./#faq">FAQ</a></div>
+    </div>
+    <small>© 2026 Vector, by The Catalyst Act</small>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="assets/vector.js"></script>
+<script>
+(function(){
+"use strict";
+const {$,$$,RM,MOTION,svgEl,smooth,onView}=V;
+const EM='#0B9F6B';
+
+/* ---------- hero: every search ends at number one ---------- */
+(function(){
+  const box=$('#serp'),sq=$('#sq'),res=$('#sres'),title=$('#stitle'),url=$('#surl'),rankN=$('#rankN'),spark=$('#spark'),note=$('#sparkNote');
+  const Q=[['andrew huberman morning routine',"Andrew Huberman's Morning Routine, Step by Step",'huberman',14],['bryan johnson supplement stack',"Bryan Johnson's Full Supplement Stack, Explained",'bryan-johnson',22],['best sleep routine for shift workers',"The Shift Worker's Sleep Routine",'sleep/shift-work',9],['joe rogan diet',"Joe Rogan's Diet: What He Eats in a Day",'joe-rogan',31],['morning routine for anxiety','A 20-Minute Morning Routine for Anxiety','anxiety/morning',17]];
+  let qi=0,vis=false,busy=false,seed=3;const rnd=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646;};
+  function sparkFor(from){const n=12,pts=[];for(let i=0;i<n;i++){const k=i/(n-1);let r=from*(1-Math.pow(k,.8))+1+(i>0&&i<n-1?(rnd()-.5)*from*.18:0);r=Math.max(1,Math.min(from+2,r));pts.push([4+232*k,8+80*(r-1)/(from+1)]);}pts[n-1][1]=8;return smooth(pts);}
+  function fill(i,instant){const[q,t,u,from]=Q[i];title.textContent=t;url.textContent='routines.club › '+u;note.textContent='Was #'+from+' eighteen months ago';spark.setAttribute('d',sparkFor(from));
+    const L=spark.getTotalLength();spark.style.strokeDasharray=L;
+    if(instant||!MOTION){spark.style.strokeDashoffset=0;rankN.textContent='1';return;}
+    spark.style.strokeDashoffset=L;gsap.to(spark,{strokeDashoffset:0,duration:1.4,ease:'power2.inOut'});
+    const o={v:from};gsap.to(o,{v:1,duration:1.4,ease:'power3.inOut',onUpdate:()=>{rankN.textContent=Math.round(o.v);}});}
+  if(!MOTION){sq.textContent=Q[0][0];res.classList.remove('wait');fill(0,true);return;}
+  const later=(fn,ms)=>setTimeout(()=>{if(vis)fn();else busy=false;},ms);
+  function type(s,i){sq.textContent=s.slice(0,i);if(i<s.length)later(()=>type(s,i+1),40+Math.random()*55);else later(()=>{fill(qi);res.classList.remove('wait');later(erase,3600);},350);}
+  function erase(){res.classList.add('wait');const s=sq.textContent;if(s.length){sq.textContent=s.slice(0,-1);later(erase,16);}else{qi=(qi+1)%Q.length;later(()=>type(Q[qi][0],0),380);}}
+  qi=-1;
+  V.whileVisible(box,v=>{vis=v;if(v&&!busy){busy=true;if(qi<0){qi=0;later(()=>type(Q[0][0],0),900);}else erase();}});
+})();
+
+/* ---------- authority bars ---------- */
+if(MOTION)onView($('#auth'),()=>gsap.to('.au i b',{scaleX:1,duration:1.6,ease:'expo.out',stagger:.12}));
+
+/* ---------- routine card: steps light up in order ---------- */
+(function(){
+  const st=$$('#routine .st');
+  if(!MOTION){st.forEach(s=>s.classList.add('on'));return;}
+  const o={p:0};gsap.to(o,{p:1,duration:2.4,ease:'power1.inOut',scrollTrigger:{trigger:'#routine',start:'top 70%',once:true},onUpdate:()=>{$('#roFill').style.transform='scaleY('+o.p+')';st.forEach((s,i)=>s.classList.toggle('on',o.p>=(i+.3)/st.length));}});
+})();
+
+/* ---------- topic map, growing with scroll ---------- */
+(function(){
+  const cv=$('#mapCv'),ctx=cv.getContext('2d'),tip=$('#mapTip'),pagesEl=$('#mapPages'),map=$('#map');
+  const HUBS=[['Celebrity routines',.5,.5,418,'1.1M'],['Sleep',.17,.32,312,'640K'],['Morning routines',.83,.32,286,'520K'],['Fitness',.15,.76,224,'260K'],['Diet and nutrition',.39,.86,198,'210K'],['Supplements',.62,.86,176,'190K'],['Longevity',.86,.76,142,'120K'],['Skincare',.33,.15,96,'40K'],['Focus',.67,.15,88,'20K']];
+  const EDGES=[[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[1,7],[7,8],[8,2],[2,6],[6,5],[5,4],[4,3],[3,1]];
+  const TOTAL=HUBS.reduce((a,h)=>a+h[3],0);
+  let W=0,H=0,p=MOTION?.02:1,hover=-1,pts=[];
+  function size(){const r=cv.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);W=r.width;H=r.height;if(!W)return;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
+    const c=Math.min(W/1150,H/650)*3.3;pts=HUBS.map(h=>{const a=[];for(let k=1;k<=h[3];k++){const r=c*Math.sqrt(k)+10,t=k*2.39996;a.push([h[1]*W+Math.cos(t)*r,h[2]*H+Math.sin(t)*r*.92]);}return a;});draw();}
+  function draw(){ctx.clearRect(0,0,W,H);
+    const shown=HUBS.map(h=>Math.max(4,Math.floor(h[3]*p)));
+    ctx.lineWidth=1;
+    EDGES.forEach(([a,b])=>{ctx.strokeStyle='rgba(11,159,107,'+(.16+.3*p)+')';ctx.beginPath();ctx.moveTo(HUBS[a][1]*W,HUBS[a][2]*H);ctx.lineTo(HUBS[b][1]*W,HUBS[b][2]*H);ctx.stroke();});
+    HUBS.forEach((h,i)=>{const hx=h[1]*W,hy=h[2]*H,hot=hover===i;
+      ctx.strokeStyle=hot?'rgba(11,159,107,.35)':'rgba(11,159,107,.1)';ctx.beginPath();
+      for(let k=0;k<shown[i];k++){const[x,y]=pts[i][k];if(k%3===0){ctx.moveTo(hx,hy);ctx.lineTo(x,y);}}ctx.stroke();
+      ctx.fillStyle=hot?'#0A7A52':'rgba(14,31,24,.55)';
+      for(let k=0;k<shown[i];k++){const[x,y]=pts[i][k];const fresh=k>shown[i]-12&&p<1;ctx.fillStyle=fresh?'#FFB23F':(hot?'#0A7A52':'rgba(10,122,82,.5)');ctx.beginPath();ctx.arc(x,y,fresh?2.2:1.5,0,6.283);ctx.fill();}});
+    HUBS.forEach((h,i)=>{const hx=h[1]*W,hy=h[2]*H,r=6+4*Math.sqrt(h[3]/418)*(.4+.6*p);
+      ctx.fillStyle='#fff';ctx.strokeStyle=EM;ctx.lineWidth=2;ctx.beginPath();ctx.arc(hx,hy,r+3,0,6.283);ctx.fill();ctx.stroke();ctx.fillStyle=EM;ctx.beginPath();ctx.arc(hx,hy,r-1.5,0,6.283);ctx.fill();
+      ctx.font='500 '+(W<700?11:13)+'px Geist, system-ui, sans-serif';ctx.textAlign='center';const tw=ctx.measureText(h[0]).width;
+      ctx.fillStyle='rgba(255,255,255,.88)';ctx.beginPath();ctx.roundRect?ctx.roundRect(hx-tw/2-8,hy+r+8,tw+16,22,11):ctx.rect(hx-tw/2-8,hy+r+8,tw+16,22);ctx.fill();
+      ctx.fillStyle='#0E1F18';ctx.fillText(h[0],hx,hy+r+23);});
+    pagesEl.textContent=V.fmt(shown.reduce((a,b)=>a+b,0));}
+  size();
+  if(MOTION){const o={v:.02};gsap.to(o,{v:1,duration:2.8,ease:'power2.out',scrollTrigger:{trigger:map,start:'top 70%',once:true},onUpdate:()=>{p=o.v;draw();}});}
+  map.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;let best=-1,bd=50*50;HUBS.forEach((h,i)=>{const d=(h[1]*W-x)**2+(h[2]*H-y)**2;if(d<bd){bd=d;best=i;}});
+    if(best!==hover){hover=best;draw();}
+    if(best>=0){const h=HUBS[best];tip.innerHTML='<b>'+h[0]+'</b> · '+h[3]+' pages · '+h[4]+' visits a month';tip.style.left=Math.min(Math.max(h[1]*W,130),W-130)+'px';tip.style.top=(h[2]*H-14)+'px';tip.classList.add('on');}else tip.classList.remove('on');});
+  map.addEventListener('pointerleave',()=>{hover=-1;draw();tip.classList.remove('on');});
+  let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(size,200);});
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(draw);
+})();
+
+/* ---------- traffic over 24 months ---------- */
+(function(){
+  const svg=$('#traffic'),read=$('#trRead'),wrap=$('#trWrap');const L=70,R=900,T=40,B=360,MAX=3500;
+  const v=m=>{let x=38+3062*Math.pow(m/24,2.25);if(m>=14)x*=1+.1*Math.min(1,(m-13.6)/1);return Math.min(3100,x);};
+  const M=Array.from({length:25},(_,m)=>m===24?3100:Math.round(v(m)));
+  const x=m=>L+(R-L)*m/24,y=k=>B-(B-T)*k/MAX;
+  const fmtK=k=>k>=1000?(k/1000).toFixed(k>=2000?1:2).replace(/0$/,'')+'M':k+'K';
+  [0,1000,2000,3000].forEach(k=>{svgEl('line',{x1:L,x2:R,y1:y(k),y2:y(k),stroke:'#D7DFD4','stroke-dasharray':k?'2 5':''},svg);const t=svgEl('text',{class:'tick',x:L-12,y:y(k)+4,'text-anchor':'end'},svg);t.textContent=k?fmtK(k):'0';});
+  [0,6,12,18,24].forEach(m=>{const t=svgEl('text',{class:'tick',x:x(m),y:B+26,'text-anchor':'middle'},svg);t.textContent=m?'Month '+m:'Start';});
+  const defs=svgEl('defs',{},svg);defs.innerHTML='<linearGradient id="emA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0B9F6B" stop-opacity=".28"/><stop offset="1" stop-color="#0B9F6B" stop-opacity="0"/></linearGradient><clipPath id="trClip"><rect id="trClipR" x="'+(L-6)+'" y="0" width="'+(R-L+12)+'" height="'+(B+4)+'"/></clipPath>';
+  const pts=M.map((k,m)=>[x(m),y(k)]),d=smooth(pts);
+  const g=svgEl('g',{'clip-path':'url(#trClip)'},svg);
+  svgEl('path',{d:d+' L '+R+' '+B+' L '+L+' '+B+' Z',fill:'url(#emA)'},g);svgEl('path',{class:'tr-line',d:d},g);
+  const MS=[[2,'Topic map live',-1],[7,'Expert review on every page',-1],[14,'Core update: +41% in a week',-1],[20,'Cited in AI answers at scale',-1],[24,'3.1M a month',1]];
+  const marks=MS.map(([m,t])=>{const gg=svgEl('g',{class:'ms'},svg);const yy=y(M[m]),ty=Math.min(yy-40,B-90);svgEl('line',{x1:x(m),x2:x(m),y1:ty+8,y2:yy-6},gg);svgEl('circle',{cx:x(m),cy:yy,r:5},gg);const tx=svgEl('text',{x:x(m),y:ty,'text-anchor':m>=22?'end':m<=3?'start':'middle'},gg);tx.textContent=t;if(m===24){tx.setAttribute('fill','#0A7A52');tx.style.fontSize='14px';}return{gg,m};});
+  const hl=svgEl('line',{y1:T,y2:B,stroke:'#0E1F18','stroke-opacity':.15,opacity:0},svg),hd=svgEl('circle',{r:5,fill:'#0E1F18',opacity:0},svg);
+  if(MOTION){const cr=$('#trClipR');cr.setAttribute('width',0);marks.forEach(o=>o.gg.style.opacity=0);
+    const o={p:0};gsap.to(o,{p:1,duration:3,ease:'power1.inOut',scrollTrigger:{trigger:svg,start:'top 70%',once:true},onUpdate:()=>{cr.setAttribute('width',(R-L+12)*o.p);const mm=o.p*24;marks.forEach(k=>{k.gg.style.opacity=mm>=k.m-.3?1:0;});}});}
+  marks.forEach(k=>k.gg.style.transition='opacity .5s');
+  svg.addEventListener('pointermove',e=>{const r=svg.getBoundingClientRect(),sc=r.width/960,px=(e.clientX-r.left)/sc;const m=Math.max(0,Math.min(24,Math.round((px-L)/(R-L)*24)));
+    hl.setAttribute('x1',x(m));hl.setAttribute('x2',x(m));hl.setAttribute('opacity',1);hd.setAttribute('cx',x(m));hd.setAttribute('cy',y(M[m]));hd.setAttribute('opacity',1);
+    const wr=wrap.getBoundingClientRect();read.style.left=(r.left-wr.left+x(m)*sc)+'px';read.style.top=(r.top-wr.top+y(M[m])*sc)+'px';read.textContent=(m?'Month '+m:'Start')+' · '+V.fmt(M[m]*1000)+' visits';read.classList.add('on');});
+  svg.addEventListener('pointerleave',()=>{hl.setAttribute('opacity',0);hd.setAttribute('opacity',0);read.classList.remove('on');});
+})();
+})();
+</script>
+</body>
+</html>
