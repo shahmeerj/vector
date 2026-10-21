@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pricing · Vector</title>
+<meta name="description" content="What Vector costs: a 90-day Sprint at $24,000, then flat monthly retainers from $8,000. No percentage of spend, no lock-in, media billed to accounts you own.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%20width%3D%2264%22%20height%3D%2264%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22f%22%20x1%3D%2213%22%20x2%3D%2245%22%20y1%3D%220%22%20y2%3D%220%22%20gradientUnits%3D%22userSpaceOnUse%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23F5F5F0%22%20stop-opacity%3D%220%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23F5F5F0%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20x%3D%22.5%22%20y%3D%22.5%22%20width%3D%2263%22%20height%3D%2263%22%20rx%3D%2214%22%20fill%3D%22%232563EB%22/%3E%3Cpath%20d%3D%22M20.5%2029L31%2046L41.5%2029%22%20fill%3D%22none%22%20stroke%3D%22%23F5F5F0%22%20stroke-width%3D%227.4%22%20stroke-miterlimit%3D%2210%22/%3E%3Cpath%20d%3D%22M13%2016.5H45%22%20stroke%3D%22url%28%23f%29%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22/%3E%3Ccircle%20cx%3D%2247%22%20cy%3D%2216.5%22%20r%3D%225%22%20fill%3D%22%23F5F5F0%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: quiet dark page, generous space; blue reserved for action and the pipeline line */
+:root{
+  --ink:#0A0A0F; --ink-2:#111117; --line:#222229; --line-2:#34343C;
+  --bone:#F5F5F0; --ash:#A1A1AA; --dim:#62626C;
+  --blue:#2563EB; --blue-2:#3B82F6; --leak:#E5484D;
+  --f:"Geist",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --m:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --e:cubic-bezier(.16,1,.3,1);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{background:var(--ink);-webkit-text-size-adjust:100%}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+body{margin:0;background:var(--ink);color:var(--bone);font:400 17px/1.6 var(--f);-webkit-font-smoothing:antialiased;overflow-x:clip}
+::selection{background:var(--blue);color:var(--bone)}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue-2);outline-offset:4px;border-radius:2px}
+img,svg{max-width:100%}
+.wrap{max-width:1200px;margin-inline:auto;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}
+section{position:relative}
+.sec{padding-block:clamp(100px,12vw,170px)}
+main > section + section{border-top:1px solid var(--line)}
+h1,h2,h3{margin:0;font-weight:500;text-wrap:balance}
+.h2{font-size:clamp(40px,5.2vw,76px);line-height:1;letter-spacing:-.045em;max-width:14ch}
+.label{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--ash);margin:0 0 22px}
+.label::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--blue-2)}
+.sub{color:var(--ash);font-size:clamp(17px,1.4vw,19px);line-height:1.6;max-width:48ch;margin:24px 0 0}
+.motion [data-rv]{opacity:0;transform:translateY(18px);filter:blur(6px)}
+
+.btn{display:inline-flex;align-items:center;gap:10px;padding:16px 24px;border-radius:999px;border:0;cursor:pointer;font:500 15px/1 var(--f);transition:background .5s var(--e),box-shadow .5s var(--e)}
+.btn-blue{background:var(--blue);color:var(--bone)}
+.btn-blue:hover{background:var(--blue-2);box-shadow:0 10px 40px -10px rgba(59,130,246,.75)}
+.btn svg,.lnk svg{transition:transform .5s var(--e)}
+.btn:hover svg,.lnk:hover svg{transform:translateX(4px)}
+.lnk{display:inline-flex;align-items:center;gap:8px;font-weight:500;position:relative;padding-block:6px}
+.lnk::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:currentColor;opacity:.3;transition:opacity .5s var(--e)}
+.lnk:hover::after{opacity:1}
+
+/* nav */
+.nav{position:fixed;top:0;left:0;right:0;z-index:50;padding-top:env(safe-area-inset-top,0px);transition:transform .7s var(--e),background .5s,border-color .5s;border-bottom:1px solid transparent}
+.nav.hide{transform:translateY(-105%)}
+.nav.solid{background:rgba(10,10,15,.72);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-bottom-color:rgba(255,255,255,.05)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:72px;gap:24px}
+.wordmark{display:inline-flex;align-items:center}
+.wordmark .wm{display:block;overflow:visible}
+.wordmark .wm-s{transition:transform .7s var(--e)}
+.wordmark:hover .wm-s{transform:translate(4px,-3px)}
+.nav-links{display:flex;gap:30px;font-size:14px;color:var(--ash)}
+.nav-links a{transition:color .4s}
+.nav-links a:hover{color:var(--bone)}
+.nav .btn{padding:11px 18px;font-size:14px}
+@media (max-width:860px){.nav-links{display:none}}
+
+
+/* fit */
+.fit{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:64px;align-items:start}
+.fit-cols{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+.fit-cols h3{font-size:14px;font-weight:500;color:var(--blue-2);padding-bottom:14px;border-bottom:1px solid var(--line)}
+.fit-cols .no h3{color:var(--dim)}
+.fit-cols ul{list-style:none;margin:0;padding:0}
+.fit-cols li{padding:18px 0;border-bottom:1px solid var(--line);font-size:18px;line-height:1.35;letter-spacing:-.01em;transition:color .5s var(--e),transform .5s var(--e);cursor:default}
+.fit-cols .yes li{color:var(--bone)}
+.fit-cols .no li{color:var(--dim)}
+.fit-cols li:hover{transform:translateX(6px)}
+.fit-cols .yes li:hover{color:var(--blue-2)}
+.fit-cols .no li:hover{color:var(--ash)}
+@media (max-width:860px){.fit{grid-template-columns:1fr;gap:40px}.fit-cols{grid-template-columns:1fr}}
+
+
+/* pricing */
+.sprint{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(40px,6vw,96px);margin-top:84px;padding-top:44px;border-top:1px solid var(--line);align-items:start}
+.pk{display:flex;align-items:center;gap:10px;margin:0;font:500 12px/1 var(--m);letter-spacing:.08em;text-transform:uppercase;color:var(--blue-2)}
+.sprint-price{font:500 clamp(64px,8vw,120px)/.95 var(--f);letter-spacing:-.055em;margin-top:26px;font-variant-numeric:tabular-nums}
+.sprint-price small{display:block;font:400 17px/1.55 var(--f);color:var(--ash);letter-spacing:0;margin-top:20px;max-width:32ch}
+.sprint .ctas{margin-top:34px}
+.price-meta{color:var(--ash);font-size:15px}
+.inc{list-style:none;margin:0;padding:0}
+.inc li{display:grid;grid-template-columns:32px 1fr;gap:16px;padding:18px 0;border-top:1px solid var(--line);font-size:18px;line-height:1.35;letter-spacing:-.01em;cursor:default;transition:transform .5s var(--e)}
+.inc li:last-child{border-bottom:1px solid var(--line)}
+.inc li small{font:500 12px/1.7 var(--m);letter-spacing:.08em;color:var(--dim);transition:color .5s var(--e)}
+.inc li:hover{transform:translateX(6px)}
+.inc li:hover small{color:var(--blue-2)}
+.gates{display:flex;flex-wrap:wrap;gap:14px 36px;margin-top:28px;font:500 12px/1.6 var(--m);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.gates b{color:var(--bone);font-weight:500;margin-left:6px}
+.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:96px;border-top:1px solid var(--line)}
+.tier{min-width:0;padding:34px 32px 34px 0;cursor:default}
+.tier + .tier{padding-left:32px;border-left:1px solid var(--line)}
+.tier .pk{color:var(--ash)}
+.tier b{display:block;font:500 clamp(36px,4vw,56px)/1 var(--f);letter-spacing:-.05em;margin-top:22px;font-variant-numeric:tabular-nums;transition:color .6s var(--e)}
+.tier b span{font-size:17px;letter-spacing:-.01em;color:var(--ash);margin-left:6px}
+.tier p{color:var(--ash);margin:16px 0 0;font-size:15px;max-width:28ch;transition:color .6s var(--e)}
+.tier ul{list-style:none;margin:26px 0 0;padding:0;font-size:15px;color:var(--ash)}
+.tier li{padding:9px 0;border-top:1px solid var(--line)}
+.tier:hover b{color:var(--blue-2)}
+.tier:hover p{color:var(--bone)}
+.tiers-foot{display:flex;flex-wrap:wrap;gap:12px 36px;padding-top:26px;border-top:1px solid var(--line);color:var(--ash);font-size:15px}
+.tiers-foot b{color:var(--bone);font-weight:500}
+.terms{margin-top:96px}
+.price-note{font-size:13px;color:var(--dim);margin:32px 0 0;max-width:62ch}
+@media (max-width:860px){.sprint{grid-template-columns:1fr;gap:40px}}
+@media (max-width:760px){.tiers{grid-template-columns:1fr}.tier,.tier + .tier{padding:28px 0;border-left:0;border-top:1px solid var(--line)}.tier:first-child{border-top:0}}
+
+
+/* cta */
+.cta{overflow:hidden}
+.cta::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(700px circle at var(--gx,75%) var(--gy,40%),rgba(37,99,235,.16),transparent 60%)}
+.cta .wrap{position:relative}
+.cta h2{font-size:clamp(48px,7.4vw,120px);line-height:.98;letter-spacing:-.055em;max-width:12ch}
+.form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px 40px;margin-top:72px}
+.f{display:flex;flex-direction:column;gap:8px;min-width:0}
+.f label{font-size:14px;color:var(--ash);transition:color .4s}
+.f input{width:100%;border:0;border-bottom:1px solid var(--line-2);background:transparent;color:var(--bone);font:400 20px/1.3 var(--f);padding:10px 0 14px;border-radius:0;outline:none;transition:border-color .5s var(--e)}
+.f input::placeholder{color:var(--dim)}
+.f:hover input{border-bottom-color:var(--ash)}
+.f:focus-within label{color:var(--blue-2)}
+.f input:focus{border-bottom-color:var(--blue-2)}
+.f .err{font-size:13px;color:var(--leak);min-height:18px}
+.form-foot{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:16px 28px}
+.form-foot p{margin:0;color:var(--ash);font-size:15px}
+.done{margin-top:72px;max-width:44ch}
+.done b{display:block;font-size:clamp(28px,3vw,40px);font-weight:500;letter-spacing:-.035em}
+.done p{color:var(--ash)}
+@media (max-width:860px){.form{grid-template-columns:1fr}}
+
+.foot{border-top:1px solid var(--line);padding-block:56px 40px}
+.foot-r{display:flex;flex-wrap:wrap;justify-content:space-between;gap:28px}
+.foot p{margin:0;color:var(--ash);font-size:15px;max-width:50ch}
+.foot-links{display:flex;flex-wrap:wrap;gap:10px 26px;font-size:14px;color:var(--ash)}
+.foot-links a{transition:color .4s}
+.foot-links a:hover{color:var(--bone)}
+.foot small{display:block;margin-top:44px;color:var(--dim);font-size:13px}
+
+
+
+/* pricing page */
+.phero{padding-top:clamp(150px,17vw,210px)}
+.nav-links a[aria-current]{color:var(--bone)}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.001ms!important;animation-duration:.001ms!important}}
+</style>
+</head>
+<body>
+<nav class="nav" aria-label="Main">
+  <div class="wrap">
+    <a href="/" class="wordmark" aria-label="Vector home"><svg class="wm" width="115" height="30" viewBox="10 12.5 144 37.5" aria-hidden="true"><defs><linearGradient id="navwm" x1="12" x2="46" y1="0" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3B82F6" stop-opacity="0"/><stop offset="1" stop-color="#3B82F6"/></linearGradient></defs><path d="M20.5 26.9L31 43.66L41.5 26.9M49.70 37.10H71.20M68.50 37.10A9.40 9.40 0 1 0 66.09 43.39M93.10 31.06A9.40 9.40 0 1 0 93.10 43.14M103.10 16.6V48.8M96.10 28.10H110.60M133.70 37.10A9.40 9.40 0 1 0 114.90 37.10A9.40 9.40 0 1 0 133.70 37.10ZM141.90 25.4V48.8M141.90 39.10C141.90 29.30 145.40 28.10 151.40 28.10" fill="none" stroke="#F5F5F0" stroke-width="5.4" stroke-miterlimit="10"/><g class="wm-s"><path d="M12 17.5H46" stroke="url(#navwm)" stroke-width="3.4" stroke-linecap="round"/><circle cx="47" cy="17.5" r="4.1" fill="#3B82F6"/></g></svg></a>
+    <div class="nav-links"><a href="/#about">Who we are</a><a href="/#work">Work</a><a href="/#services">What we do</a><a href="/#testlead">TestLead</a><a href="/#leak">Find your leak</a><a href="/pricing" aria-current="page">Pricing</a><a href="/#faq">FAQ</a></div>
+    <a href="/#call" class="btn btn-blue" data-cta="pricing-nav-book-call">Book a call</a>
+  </div>
+</nav>
+
+<main>
+<section class="sec phero" id="pricing">
+  <div class="wrap">
+    <p class="label">Pricing</p>
+    <h1 class="h2" data-rv>What it costs.</h1>
+    <p class="sub" data-rv>Published so you can decide before we talk. Flat fees in USD. Media is billed to ad accounts you own.</p>
+
+    <div class="sprint" data-rv>
+      <div>
+        <p class="pk">Start here · 90 days</p>
+        <div class="sprint-price">$24,000<small>The Sprint. Two channels, usually LinkedIn and Google Search, over 90 days. One channel is $16,000.</small></div>
+        <div class="ctas"><a class="btn btn-blue" href="/#call" data-cta="pricing-start-sprint">Start with the Sprint <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a><span class="price-meta">Half at signing, half at day 30.</span></div>
+      </div>
+      <div>
+        <ul class="inc">
+          <li><small>01</small><span>Conversion tracking rebuilt, with CRM stages sent back to Google and LinkedIn</span></li>
+          <li><small>02</small><span>SQL and opportunity definitions agreed in writing with your sales lead</span></li>
+          <li><small>03</small><span>Qualifying forms, enrichment and routing, so bad-fit leads never reach your calendar</span></li>
+          <li><small>04</small><span>One landing page, built and tested</span></li>
+          <li><small>05</small><span>Creative direction and briefs for your design team</span></li>
+          <li><small>06</small><span>A written update every week and a decision meeting at day 90</span></li>
+        </ul>
+        <div class="gates"><span>Day 15<b>Tracking live</b></span><span>Day 25<b>Campaigns live</b></span><span>Day 30 · 60 · 90<b>Readouts</b></span></div>
+      </div>
+    </div>
+
+    <div class="tiers" data-rv>
+      <div class="tier"><p class="pk">After the Sprint · Core</p><b>$8,000<span>/month</span></b><p>One channel, kept sharp.</p><ul><li>Bidding on pipeline stage values</li><li>Landing-page iteration</li><li>Monthly review</li></ul></div>
+      <div class="tier"><p class="pk">Full</p><b>$12,000<span>/month</span></b><p>Two to three channels, run as one system.</p><ul><li>Everything in Core</li><li>Creative briefs every month</li><li>Quarterly holdout test</li><li>Cost per opportunity, by channel</li></ul></div>
+      <div class="tier"><p class="pk">Scale</p><b>Quoted</b><p>Three or more channels, or over $100K a month in media.</p><ul><li>Everything in Full</li><li>Account-based layer with a named list</li><li>Weekly review</li></ul></div>
+    </div>
+    <div class="tiers-foot" data-rv><span><b>Month to month</b> after the Sprint</span><span><b>30 days’</b> notice</span><span><b>$15,000</b> minimum monthly media</span></div>
+
+    <div class="fit-cols terms" data-rv>
+      <div class="yes"><h3>What we commit to</h3><ul><li>Tracking and CRM feedback live by day 15, campaigns by day 25</li><li>A written update every week, in plain language</li><li>Replies within four hours, 7–11am Eastern</li><li>The people you meet are the people on your account. Nobody is swapped without your consent</li><li>You keep every account, pixel, audience, file and test log if you leave</li></ul></div>
+      <div class="no"><h3>What we won’t do</h3><ul><li>Charge a percentage of your ad spend</li><li>Charge per lead</li><li>Lock you in for twelve months</li><li>Guarantee pipeline numbers. They depend on your product, your sales team and your market. Anyone who promises them is guessing</li></ul></div>
+    </div>
+    <p class="price-note">Media, creative production and third-party tools are not included and are billed to you directly.</p>
+  </div>
+</section>
+
+<section class="sec cta" id="call">
+  <div class="wrap">
+    <h2 data-rv>Let's look at your pipeline.</h2>
+    <p class="sub" data-rv>Tell us where you are. We reply within two business days, and if we're not the right fit, we'll say so.</p>
+    <div class="ctas" data-rv><a class="btn btn-blue" href="/#call" data-cta="pricing-book-call">Book a call <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a><p class="price-meta" style="margin:0">20 minutes. No deck, no pitch.</p></div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-r">
+      <div><a href="/" class="wordmark" aria-label="Vector home"><svg class="wm" width="108" height="28" viewBox="10 12.5 144 37.5" aria-hidden="true"><defs><linearGradient id="footwm" x1="12" x2="46" y1="0" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3B82F6" stop-opacity="0"/><stop offset="1" stop-color="#3B82F6"/></linearGradient></defs><path d="M20.5 26.9L31 43.66L41.5 26.9M49.70 37.10H71.20M68.50 37.10A9.40 9.40 0 1 0 66.09 43.39M93.10 31.06A9.40 9.40 0 1 0 93.10 43.14M103.10 16.6V48.8M96.10 28.10H110.60M133.70 37.10A9.40 9.40 0 1 0 114.90 37.10A9.40 9.40 0 1 0 133.70 37.10ZM141.90 25.4V48.8M141.90 39.10C141.90 29.30 145.40 28.10 151.40 28.10" fill="none" stroke="#F5F5F0" stroke-width="5.4" stroke-miterlimit="10"/><g class="wm-s"><path d="M12 17.5H46" stroke="url(#footwm)" stroke-width="3.4" stroke-linecap="round"/><circle cx="47" cy="17.5" r="4.1" fill="#3B82F6"/></g></svg></a><p style="margin-top:16px">B2B performance marketing for software companies selling into the US and Canada. A practice of The Catalyst Act.</p></div>
+      <div class="foot-links"><a href="/#about">Who we are</a><a href="/#work">Work</a><a href="/#services">What we do</a><a href="/#testlead">TestLead</a><a href="/#leak">Find your leak</a><a href="/pricing" aria-current="page">Pricing</a><a href="/#faq">FAQ</a><a href="https://thecatalystact.com" target="_blank" rel="noopener">The Catalyst Act</a></div>
+    </div>
+    <small>© 2026 Vector, by The Catalyst Act</small>
+  </div>
+</footer>
+
+<script src="assets/leads.js"></script>
+<script>
+(function(){
+const nav=document.querySelector('.nav');let lastY=0,tk=false;
+addEventListener('scroll',()=>{if(tk)return;tk=true;requestAnimationFrame(()=>{const y=scrollY;nav.classList.toggle('solid',y>30);nav.classList.toggle('hide',y>lastY&&y>500);lastY=y;tk=false;});},{passive:true});
+const cta=document.querySelector('.cta');if(cta){cta.addEventListener('pointermove',e=>{const r=cta.getBoundingClientRect();cta.style.setProperty('--gx',((e.clientX-r.left)/r.width*100)+'%');cta.style.setProperty('--gy',((e.clientY-r.top)/r.height*100)+'%');});}
+})();
+</script>
+</body>
+</html>
