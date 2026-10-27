@@ -1,6 +1,6 @@
 # Vector — landing page
 
-Static site for vector.thecatalystact.com (Vector, by The Catalyst Act).
+Static site for meetvector.co (Vector).
 
 - `index.html` — landing page
 - `tamba.html`, `personology.html`, `routines.html` — case studies
