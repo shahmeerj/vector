@@ -1,0 +1,59 @@
+/* /admin. Sits on top of vector.css. */
+body{font-size:15px;line-height:1.5}
+.a-wrap{max-width:980px;margin-inline:auto;padding:0 20px 120px}
+.a-top{display:flex;align-items:center;justify-content:space-between;gap:16px;height:68px;border-bottom:1px solid var(--line);margin-bottom:40px}
+.a-brand{font:500 12.5px var(--m);letter-spacing:.08em;text-transform:uppercase;color:var(--ash)}
+.a-top nav{display:flex;align-items:center;gap:20px;font-size:14px;color:var(--ash)}
+.a-link{all:unset;cursor:pointer;color:var(--ash);transition:color .3s}
+.a-link:hover{color:var(--bone)}
+.a-link:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+h1{font-size:clamp(30px,4vw,42px);line-height:1.05;letter-spacing:-.04em}
+.a-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px}
+.btn{padding:12px 18px;font-size:14px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.btn-line{background:transparent;border:1px solid var(--line-2);color:var(--bone)}
+.btn-line:hover{border-color:var(--ash)}
+.btn-danger{background:transparent;border:1px solid var(--line-2);color:#F38B8E}
+.btn-danger:hover{border-color:#E5484D}
+
+.login{max-width:380px;margin:18vh auto 0;padding:0 20px}
+.login h1{margin-bottom:24px}
+.login .btn{margin-top:16px;width:100%;justify-content:center}
+
+.jobs{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--ink-2)}
+.job{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 20px;align-items:center;padding:18px 20px;width:100%;border:0;border-top:1px solid var(--line);background:transparent;text-align:left;cursor:pointer;transition:background .3s}
+.job:first-child{border-top:0}
+.job:hover{background:rgba(255,255,255,.03)}
+.job-t{font-size:17px;font-weight:500;letter-spacing:-.015em;overflow-wrap:anywhere}
+.job-s{font-size:13.5px;color:var(--ash);grid-column:1}
+.pill{grid-column:2;grid-row:1/3;font:500 11.5px var(--m);letter-spacing:.08em;text-transform:uppercase;padding:6px 10px;border-radius:999px;border:1px solid var(--line-2);color:var(--ash)}
+.pill.Open{background:var(--vblue);border-color:var(--vblue);color:#F5F5F0}
+.empty{padding:48px 24px;text-align:center;color:var(--ash);border:1px dashed var(--line-2);border-radius:16px}
+
+.ed{display:flex;flex-direction:column;gap:20px}
+.card{border:1px solid var(--line);border-radius:16px;background:var(--ink-2);padding:clamp(18px,3vw,26px)}
+.card h2{font-size:18px;letter-spacing:-.02em;margin-bottom:4px}
+.card>p{margin:0 0 18px;font-size:14px;color:var(--ash)}
+.card h2+.fields{margin-top:16px}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 20px}
+.fld{display:flex;flex-direction:column;gap:6px;min-width:0}
+.fld.wide{grid-column:1/-1}
+.fld label,.fld .lbl{font-size:13.5px;color:var(--ash)}
+.fld em{font-style:normal;color:var(--dim)}
+input[type=text],input[type=password],select,textarea{width:100%;background:var(--ink);color:var(--bone);border:1px solid var(--line-2);border-radius:10px;padding:10px 12px;font:400 15px/1.45 var(--f);outline:none;transition:border-color .3s}
+input:focus,select:focus,textarea:focus{border-color:var(--vblue-2)}
+textarea{resize:vertical;min-height:110px}
+.fld.bad input,.fld.bad select,.fld.bad textarea{border-color:#E5484D}
+.e{font-size:13px;color:#F38B8E}
+.e:empty{display:none}
+@media (max-width:640px){.fields{grid-template-columns:1fr}}
+
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(17,17,23,.92);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-top:1px solid var(--line)}
+.bar-in{max-width:980px;margin-inline:auto;padding:12px 20px calc(12px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.bar-msg{flex:1 1 180px;font-size:14px;color:var(--ash);min-width:0}
+.bar-msg.err{color:#F38B8E}
+.bar-msg.good{color:var(--bone)}
+.bar-acts{display:flex;flex-wrap:wrap;gap:10px}
+.url{font:400 13px var(--m);color:var(--ash);overflow-wrap:anywhere}
+.url a{color:var(--bone);text-decoration:underline;text-underline-offset:3px}
+.msg{margin:0 0 20px;padding:12px 14px;border-radius:10px;background:rgba(229,72,77,.1);color:#F38B8E;font-size:14px}
