@@ -32,32 +32,13 @@ drop.addEventListener('drop',function(e){pickFile(e.dataTransfer.files[0]);});
 
 form.addEventListener('input',function(e){var f=e.target.closest('.bad');if(f&&f.dataset.field!=='cv')setError(f.dataset.field,'');});
 
-function answers(){
-  var out={};
-  form.querySelectorAll('[data-question]').forEach(function(el){
-    var id=el.dataset.question;
-    if(el.dataset.kind==='multi'){out[id]=[].map.call(el.querySelectorAll('input:checked'),function(i){return i.value;});}
-    else if(el.dataset.kind==='single'){var c=el.querySelector('input:checked');out[id]=c?c.value:'';}
-    else{out[id]=el.value.trim();}
-  });
-  return out;
-}
-
-function validate(ans){
+function validate(){
   var bad=[];
   function check(id,ok,msg){setError(id,ok?'':msg);if(!ok)bad.push(id);}
   check('name',val('name').length>=2,'Add your full name.');
   check('email',/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(val('email')),'Add a valid email.');
   check('whatsapp',/^\+?[\d\s()-]{7,25}$/.test(val('whatsapp')),'Add a valid number, with country code.');
-  check('location',val('location').length>=2,'Add your city and country.');
-  check('linkedin',/linkedin\.com\/\S+/i.test(val('linkedin')),'Add a link to your LinkedIn profile.');
   check('cv',!!cv,'Add your CV.');
-  form.querySelectorAll('[data-field][data-required]').forEach(function(f){
-    var a=ans[f.dataset.field];check(f.dataset.field,!!(a&&a.length),'This one is required.');
-  });
-  check('salary',!!val('salary'),'Add your expected salary.');
-  check('start',!!val('start'),'Add when you could start.');
-  check('consent',document.getElementById('ap-consent').checked,'We need your agreement to store your application.');
   return bad;
 }
 
@@ -89,7 +70,7 @@ form.addEventListener('submit',function(e){
   e.preventDefault();
   if(btn.disabled)return;
   note.textContent='';note.classList.remove('is-err');
-  var ans=answers(),bad=validate(ans);
+  var bad=validate();
   if(bad.length){fail('Please check the highlighted fields.');focusFirst(bad[0]);return;}
 
   form.classList.add('busy');btnText.textContent='Sending...';
@@ -97,9 +78,8 @@ form.addEventListener('submit',function(e){
     var a=attribution();
     return fetch('/api/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
       job_id:form.dataset.job,submission_id:submissionId,
-      name:val('name'),email:val('email'),whatsapp:val('whatsapp'),location:val('location'),linkedin:val('linkedin'),
-      salary:val('salary'),start:val('start'),consent:true,company_phone:val('company_phone'),
-      answers:ans,cv:{name:cv.name,base64:base64},source:a.source,landing:a.landing,referrer:a.referrer
+      name:val('name'),email:val('email'),whatsapp:val('whatsapp'),company_phone:val('company_phone'),
+      cv:{name:cv.name,base64:base64},source:a.source,landing:a.landing,referrer:a.referrer
     })});
   }).then(function(r){
     return r.json().catch(function(){return{ok:false};}).then(function(d){return{status:r.status,data:d};});

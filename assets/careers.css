@@ -35,35 +35,21 @@
 
 .apply{padding-block:clamp(72px,9vw,120px);background:var(--ink-2);border-top:1px solid var(--line)}
 .apply h2{font-size:clamp(34px,4.4vw,56px);line-height:1.02;letter-spacing:-.045em}
-.apply-form{margin-top:clamp(36px,5vw,56px);display:flex;flex-direction:column;gap:clamp(36px,5vw,52px)}
-.group{border:0;margin:0;padding:0;min-width:0}
-.group>legend{padding:0;margin-bottom:24px;font:500 12.5px/1.4 var(--m);letter-spacing:.08em;text-transform:uppercase;color:var(--ash)}
+.apply-form{margin-top:clamp(36px,5vw,56px);display:flex;flex-direction:column;gap:32px}
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 36px}
-.stack{display:flex;flex-direction:column;gap:30px}
 @media (max-width:680px){.grid{grid-template-columns:1fr}}
 
 .f{display:flex;flex-direction:column;gap:6px;min-width:0;border:0;margin:0;padding:0}
-.f label,.f legend,.f-label{font-size:15px;line-height:1.4;color:var(--bone);padding:0;transition:color .4s}
-.f em{font-style:normal;color:var(--dim)}
-.f input:not([type=file]):not([type=checkbox]):not([type=radio]),.f textarea{width:100%;border:0;border-bottom:1px solid var(--line-2);background:transparent;color:var(--bone);font:400 18px/1.4 var(--f);padding:8px 0 12px;border-radius:0;outline:none;transition:border-color .5s var(--e)}
-.f textarea{border:1px solid var(--line-2);border-radius:12px;padding:12px 14px;margin-top:4px;resize:vertical;min-height:130px}
+.f label,.f-label{font-size:15px;line-height:1.4;color:var(--bone);padding:0;transition:color .4s}
+.f input:not([type=file]){width:100%;border:0;border-bottom:1px solid var(--line-2);background:transparent;color:var(--bone);font:400 18px/1.4 var(--f);padding:8px 0 12px;border-radius:0;outline:none;transition:border-color .5s var(--e)}
 .f input::placeholder{color:var(--dim)}
-.f input:hover,.f textarea:hover{border-color:var(--ash)}
-.f input:focus,.f textarea:focus{border-color:var(--blue-2)}
+.f input:hover{border-color:var(--ash)}
+.f input:focus{border-color:var(--blue-2)}
 .f:focus-within>label{color:var(--blue-2)}
 .f .err{font-size:13.5px;color:#F38B8E;min-height:0}
 .f .err:empty{display:none}
-.f .hint{font-size:13px;color:var(--dim)}
-.f.bad input:not([type=checkbox]):not([type=radio]):not([type=file]),.f.bad textarea{border-color:var(--leak)}
+.f.bad input:not([type=file]){border-color:var(--leak)}
 .f.hp{position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden}
-
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.chip{position:relative;cursor:pointer}
-.chip input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
-.chip span{display:block;padding:10px 16px;border-radius:999px;border:1px solid var(--line-2);font-size:15px;line-height:1.2;color:var(--ash);transition:color .3s,border-color .3s,background .3s}
-.chip:hover span{border-color:var(--ash);color:var(--bone)}
-.chip input:checked+span{background:var(--vblue);border-color:var(--vblue);color:#F5F5F0}
-.chip input:focus-visible+span{outline:2px solid var(--acc);outline-offset:3px}
 
 .drop{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:6px;padding:28px 20px;text-align:center;border:1px dashed var(--line-2);border-radius:14px;cursor:pointer;transition:border-color .4s,background .4s}
 .f .drop{color:inherit;padding:28px 20px}
@@ -75,11 +61,9 @@
 .drop.has{border-style:solid;border-color:var(--vblue-2)}
 .f.bad .drop{border-color:var(--leak)}
 
-.check{display:flex;align-items:flex-start;gap:12px;font-size:15px;color:var(--ash)!important;cursor:pointer}
-.check input{width:18px;height:18px;flex:none;margin:2px 0 0;accent-color:var(--vblue)}
-
 .form-foot{display:flex;flex-wrap:wrap;align-items:center;gap:16px 28px}
 .form-foot p{margin:0;color:var(--ash);font-size:15px}
+.fine{margin:0;color:var(--dim);font-size:13.5px}
 .form-foot p.is-err{color:#F38B8E}
 .form-foot .btn[disabled]{opacity:.55;cursor:not-allowed}
 .apply-form.busy .btn{opacity:.6;pointer-events:none}

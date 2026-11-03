@@ -8,37 +8,6 @@ const {
 const JOB_STATUS = ['Draft', 'Open', 'Closed'];
 const WORK_TYPES = ['', 'Remote', 'Hybrid', 'On-site'];
 const EMPLOYMENT_TYPES = ['', 'Full-time', 'Part-time', 'Contract'];
-const QUESTION_TYPES = ['text', 'long', 'single', 'multi'];
-const RESERVED = [
-  'Received (UTC)', 'Name', 'Email', 'WhatsApp', 'City and country', 'LinkedIn', 'CV', 'Expected salary',
-  'Earliest start', 'Source', 'Landing page', 'Referrer', 'IP country', 'Status', 'Notes',
-].map((s) => s.toLowerCase());
-
-function cleanQuestions(input, errors) {
-  const list = Array.isArray(input) ? input.slice(0, 20) : [];
-  const seen = new Set();
-  return list.map((q, i) => {
-    const out = {
-      id: /^q_[a-z0-9_]{1,40}$/.test(q && q.id) ? q.id : `q_${Date.now().toString(36)}${i}`,
-      label: line(q && q.label, 200),
-      type: QUESTION_TYPES.includes(q && q.type) ? q.type : 'text',
-      required: !!(q && q.required),
-      options: [],
-    };
-    if (out.type === 'single' || out.type === 'multi') {
-      const raw = Array.isArray(q.options) ? q.options : [];
-      out.options = [...new Set(raw.map((o) => line(o, 100)).filter(Boolean))].slice(0, 15);
-      if (out.options.length < 2) errors[`question_${i}`] = 'Add at least two options.';
-    }
-    const key = out.label.toLowerCase();
-    if (!out.label) errors[`question_${i}`] = 'Add the question text.';
-    else if (RESERVED.includes(key)) errors[`question_${i}`] = 'The form already asks this.';
-    else if (seen.has(key)) errors[`question_${i}`] = 'This question appears twice.';
-    seen.add(key);
-    return out;
-  });
-}
-
 function cleanJob(input) {
   const errors = {};
   const job = {
@@ -54,7 +23,6 @@ function cleanJob(input) {
     nice_to_have: str(input.nice_to_have, 4000),
   };
   if (typeof input.id === 'string' && input.id) job.id = line(input.id, 80);
-  job.questions = cleanQuestions(input.questions, errors);
 
   if (job.title.length < 3) errors.title = 'Add a job title.';
   if (job.status === 'Open') {

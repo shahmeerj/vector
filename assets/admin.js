@@ -3,8 +3,6 @@
 "use strict";
 var app=document.getElementById('app');
 var state={jobs:[],sheetUrl:'',job:null,dirty:false};
-var CORE=['Full name','Email','WhatsApp','City and country','LinkedIn','CV upload','Expected salary','Earliest start','Consent'];
-var TYPES=[['text','Short answer'],['long','Long answer'],['single','Pick one'],['multi','Pick several']];
 
 /* DOM helper: h('div.card',{onclick:fn},child,child) */
 function h(sel,attrs){
@@ -67,7 +65,7 @@ function load(){
   }).catch(function(){login('Couldn’t connect. Try again.');});
 }
 
-function blankJob(){return{title:'',status:'Draft',location:'',work_type:'',employment_type:'',salary:'',intro:'',responsibilities:'',requirements:'',nice_to_have:'',questions:[]};}
+function blankJob(){return{title:'',status:'Draft',location:'',work_type:'',employment_type:'',salary:'',intro:'',responsibilities:'',requirements:'',nice_to_have:''};}
 
 function subline(j){
   var n=Number(j.applications)||0;
@@ -88,11 +86,9 @@ function list(){
     })):h('p.empty',{},'No listings yet. Create your first one.')));
 }
 
-function qId(){return'q_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
-
 function edit(job){
   state.job=job;state.dirty=false;
-  var errors={},qList=h('div.qs'),msg=h('span.bar-msg'),acts=h('div.bar-acts');
+  var errors={},msg=h('span.bar-msg'),acts=h('div.bar-acts');
   var discardArmed=false,deleteArmed=false,busy=false;
 
   function say(text,kind){msg.textContent=text||'';msg.className='bar-msg'+(kind?' '+kind:'');}
@@ -110,34 +106,10 @@ function edit(job){
       h('label',{for:id},label,opts.optional?h('em',{},' (optional)'):null),control,h('span.e'));
   }
 
-  function renderQuestions(){
-    qList.textContent='';
-    (job.questions||[]).forEach(function(q,i){
-      var options=h('textarea',{placeholder:'One option per line',rows:Math.max(3,(q.options||[]).length+1),value:(q.options||[]).join('\n'),'aria-label':'Options',oninput:function(){q.options=options.value.split('\n').map(function(s){return s.trim();}).filter(Boolean);touch();}});
-      var choice=q.type==='single'||q.type==='multi';
-      var move=function(by){return function(){var a=job.questions,t=a[i+by];if(!t)return;a[i+by]=q;a[i]=t;touch();renderQuestions();};};
-      qList.appendChild(h('div.q',{'data-q':i},
-        h('div.q-row',{},
-          h('input',{type:'text',placeholder:'Question',value:q.label,'aria-label':'Question',oninput:function(e){q.label=e.target.value;touch();}}),
-          h('select',{'aria-label':'Answer type',onchange:function(e){q.type=e.target.value;touch();renderQuestions();}},
-            TYPES.map(function(t){return h('option',{value:t[0],selected:t[0]===q.type},t[1]);}))),
-        choice?options:null,
-        h('span.e'),
-        h('div.q-foot',{},
-          h('label',{},h('input',{type:'checkbox',checked:q.required,onchange:function(e){q.required=e.target.checked;touch();}}),'Required'),
-          h('div.q-acts',{},
-            i>0?h('button.a-link',{type:'button',onclick:move(-1)},'Move up'):null,
-            i<job.questions.length-1?h('button.a-link',{type:'button',onclick:move(1)},'Move down'):null,
-            h('button.a-link',{type:'button',onclick:function(){job.questions.splice(i,1);touch();renderQuestions();}},'Remove')))));
-    });
-    showErrors();
-  }
-
   function showErrors(){
     app.querySelectorAll('.fld[data-key]').forEach(function(f){
       var e=errors[f.dataset.key];f.classList.toggle('bad',!!e);f.querySelector('.e').textContent=e||'';
     });
-    app.querySelectorAll('.q[data-q]').forEach(function(q){q.querySelector('.e').textContent=errors['question_'+q.dataset.q]||'';});
   }
 
   function save(status,then){
@@ -150,7 +122,7 @@ function edit(job){
       if(!d.ok){
         errors=d.errors||{};showErrors();drawActions();
         say(d.errors?'Fix the highlighted fields.':(d.error||'Couldn’t save.'),'err');
-        var bad=app.querySelector('.fld.bad, .q .e:not(:empty)');if(bad)bad.scrollIntoView({block:'center',behavior:'smooth'});
+        var bad=app.querySelector('.fld.bad');if(bad)bad.scrollIntoView({block:'center',behavior:'smooth'});
         return;
       }
       var fresh=!job.id;
@@ -229,14 +201,9 @@ function edit(job){
           field('intro','Introduction',{wide:true,area:true,rows:4}),
           field('responsibilities','What you’ll do',{wide:true,area:true}),
           field('requirements','What you need',{wide:true,area:true}),
-          field('nice_to_have','Nice to have',{wide:true,area:true,optional:true}))),
-      h('section.card',{},h('h2',{},'Application form'),
-        h('p',{},'Every application asks these. Your extra questions appear after them and each gets its own column in the Sheet.'),
-        h('ul.core',{},CORE.map(function(c){return h('li',{},c);})),
-        qList,
-        h('button.btn.btn-line.add',{type:'button',onclick:function(){job.questions=job.questions||[];job.questions.push({id:qId(),label:'',type:'single',required:true,options:[]});touch();renderQuestions();var q=app.querySelector('.q:last-child input');if(q)q.focus();}},'Add question'))),
+          field('nice_to_have','Nice to have',{wide:true,area:true,optional:true})))),
     h('div.bar',{},h('div.bar-in',{},msg,acts))));
-  renderQuestions();drawActions();drawUrl();
+  showErrors();drawActions();drawUrl();
   if(state.dirty)say('Unsaved changes');
 }
 

@@ -80,8 +80,8 @@ Status (starts as `New`) · Notes (flags repeat submissions)
 `/careers` lists open roles and `/careers/<role>` shows the post and application
 form. Listings are managed at `/admin`. Everything lives in one Google Sheet,
 separate from the leads Sheet: a `Jobs` tab, plus one applications tab per role
-(created on the first application). Each role-specific question gets its own
-column. CVs go to a Drive folder called `Vector job applications`, and each row
+(created on the first application). Applicants give their name, email, WhatsApp
+number and CV. CVs go to a Drive folder called `Vector job applications`, and each row
 links to its CV. Drive files stay private to the Google account that owns the
 script unless you share the folder.
 

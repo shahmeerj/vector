@@ -19,11 +19,10 @@ const STATUSES = ['New', 'Reviewing', 'Interview', 'Rejected', 'Hired'];
 const JOB_COLUMNS = [
   'id', 'slug', 'title', 'status', 'location', 'work_type', 'employment_type',
   'salary', 'intro', 'responsibilities', 'requirements', 'nice_to_have',
-  'questions', 'apply_tab', 'created_at', 'updated_at', 'published_at',
+  'apply_tab', 'created_at', 'updated_at', 'published_at',
 ];
 
-const TAB_HEAD = ['Received (UTC)', 'Name', 'Email', 'WhatsApp', 'City and country', 'LinkedIn', 'CV', 'Expected salary', 'Earliest start'];
-const TAB_TAIL = ['Source', 'Landing page', 'Referrer', 'IP country', 'Status', 'Notes'];
+const TAB_COLUMNS = ['Received (UTC)', 'Name', 'Email', 'WhatsApp', 'CV', 'Source', 'Landing page', 'Referrer', 'IP country', 'Status', 'Notes'];
 
 function doPost(e) {
   try {
@@ -67,7 +66,6 @@ function readJobs_() {
   return sheet.getRange(2, 1, last - 1, JOB_COLUMNS.length).getValues().map((row, i) => {
     const job = {};
     JOB_COLUMNS.forEach((key, c) => { job[key] = row[c] == null ? '' : String(row[c]); });
-    try { job.questions = JSON.parse(job.questions || '[]'); } catch (err) { job.questions = []; }
     const tab = job.apply_tab && ss.getSheetByName(job.apply_tab);
     job.applications = tab ? Math.max(tab.getLastRow() - 1, 0) : 0;
     job._row = i + 2;
@@ -76,10 +74,7 @@ function readJobs_() {
 }
 
 function writeJob_(sheet, row, job) {
-  const values = JOB_COLUMNS.map((key) => {
-    if (key === 'questions') return text_(JSON.stringify(job.questions || []));
-    return text_(job[key]);
-  });
+  const values = JOB_COLUMNS.map((key) => text_(job[key]));
   sheet.getRange(row, 1, 1, JOB_COLUMNS.length).setValues([values]);
 }
 
@@ -152,9 +147,6 @@ function apply_(body) {
   if (!job) return { ok: false, error: 'not found' };
   if (job.status !== 'Open') return { ok: false, error: 'closed' };
 
-  const checked = checkAnswers_(job.questions, a.answers || {});
-  if (Object.keys(checked.errors).length) return { ok: false, errors: checked.errors };
-
   // Upload before taking the lock so a slow file doesn't hold up other applicants.
   const cvUrl = saveCv_(job, a, body.cv);
 
@@ -164,17 +156,12 @@ function apply_(body) {
   try {
     tab = applicationsTab_(readJobs_().find((j) => j.id === job.id));
     previous = countEmail_(tab, a.email);
-    const header = tab.getRange(1, 1, 1, tab.getLastColumn()).getValues()[0];
     const values = {
       'Received (UTC)': new Date().toISOString(),
       'Name': text_(a.name),
       'Email': text_(a.email),
       'WhatsApp': text_(a.whatsapp),
-      'City and country': text_(a.location),
-      'LinkedIn': text_(a.linkedin),
       'CV': '=HYPERLINK("' + cvUrl + '","Open CV")',
-      'Expected salary': text_(a.salary),
-      'Earliest start': text_(a.start),
       'Source': text_(a.source),
       'Landing page': text_(a.landing),
       'Referrer': text_(a.referrer),
@@ -182,8 +169,7 @@ function apply_(body) {
       'Status': 'New',
       'Notes': previous ? 'Applied before (' + previous + 'x)' : '',
     };
-    job.questions.forEach((q) => { values[q.label] = text_(checked.answers[q.label]); });
-    tab.appendRow(header.map((label) => (label in values ? values[label] : '')));
+    tab.appendRow(TAB_COLUMNS.map((label) => values[label]));
     sheetUrl = tab.getParent().getUrl() + '#gid=' + tab.getSheetId();
   } finally {
     lock.releaseLock();
@@ -191,30 +177,12 @@ function apply_(body) {
 
   if (dedupeKey) cache.put(dedupeKey, '1', 21600);
   try {
-    sendEmail_(job, a, checked.answers, cvUrl, previous, sheetUrl);
+    sendEmail_(job, a, cvUrl, previous, sheetUrl);
   } catch (err) {
     // The row is saved; email failure should not fail the application.
     console.error('email failed: ' + err);
   }
   return { ok: true };
-}
-
-function checkAnswers_(questions, input) {
-  const answers = {};
-  const errors = {};
-  (questions || []).forEach((q) => {
-    let v = input[q.id];
-    const choice = q.type === 'single' || q.type === 'multi';
-    if (q.type === 'multi') {
-      v = (Array.isArray(v) ? v : []).map(String).filter((o) => q.options.indexOf(o) !== -1);
-    } else {
-      v = typeof v === 'string' ? v.trim().slice(0, q.type === 'long' ? 3000 : 500) : '';
-      if (choice && q.options.indexOf(v) === -1) v = '';
-    }
-    if (q.required && !v.length) errors[q.id] = 'This one is required.';
-    answers[q.label] = Array.isArray(v) ? v.join(', ') : v;
-  });
-  return { answers: answers, errors: errors };
 }
 
 function applicationsTab_(job) {
@@ -225,31 +193,22 @@ function applicationsTab_(job) {
     let name = base;
     for (let n = 2; ss.getSheetByName(name); n++) name = base + ' ' + n;
     tab = ss.insertSheet(name);
-    const labels = TAB_HEAD.concat(TAB_TAIL);
-    tab.appendRow(labels);
+    tab.appendRow(TAB_COLUMNS);
     tab.setFrozenRows(1);
-    tab.getRange(1, 1, 1, labels.length).setFontWeight('bold');
-    const statusCol = labels.indexOf('Status') + 1;
+    tab.getRange(1, 1, 1, TAB_COLUMNS.length).setFontWeight('bold');
+    const statusCol = TAB_COLUMNS.indexOf('Status') + 1;
     const rule = SpreadsheetApp.newDataValidation().requireValueInList(STATUSES, true).build();
     tab.getRange(2, statusCol, tab.getMaxRows() - 1, 1).setDataValidation(rule);
     job.apply_tab = name;
     writeJob_(jobsSheet_(), job._row, job);
   }
-  // Questions added to a job later get their own column, before the tracking columns.
-  (job.questions || []).forEach((q) => {
-    const header = tab.getRange(1, 1, 1, tab.getLastColumn()).getValues()[0];
-    if (header.indexOf(q.label) !== -1) return;
-    const at = header.indexOf(TAB_TAIL[0]) + 1;
-    tab.insertColumnBefore(at);
-    tab.getRange(1, at).setValue(text_(q.label)).setFontWeight('bold');
-  });
   return tab;
 }
 
 function countEmail_(tab, email) {
   const last = tab.getLastRow();
   if (last < 2) return 0;
-  const col = TAB_HEAD.indexOf('Email') + 1;
+  const col = TAB_COLUMNS.indexOf('Email') + 1;
   const target = String(email).toLowerCase();
   return tab.getRange(2, col, last - 1, 1).getValues().filter(([v]) => String(v).toLowerCase() === target).length;
 }
@@ -269,22 +228,15 @@ function saveCv_(job, a, cv) {
   return folder.createFile(blob).getUrl();
 }
 
-function sendEmail_(job, a, answers, cvUrl, previous, sheetUrl) {
+function sendEmail_(job, a, cvUrl, previous, sheetUrl) {
   const lines = [
     a.name + ' applied for ' + job.title + '.',
     '',
     'Email:     ' + a.email,
     'WhatsApp:  ' + a.whatsapp,
-    'Location:  ' + a.location,
-    'LinkedIn:  ' + a.linkedin,
-    'Salary:    ' + a.salary,
-    'Start:     ' + a.start,
     'Source:    ' + (a.source || 'Direct'),
     '',
   ];
-  (job.questions || []).forEach((q) => {
-    if (answers[q.label]) lines.push(q.label, '  ' + answers[q.label], '');
-  });
   if (previous) lines.push('Note: applied before (' + previous + 'x)', '');
   lines.push('CV:    ' + cvUrl, 'Sheet: ' + sheetUrl);
 
@@ -331,15 +283,5 @@ function firstJob_() {
     responsibilities: 'Launch and manage campaigns on Meta, Google Ads, LinkedIn, Microsoft Ads and more\nTest ad creative and recommend budget changes every week\nHelp improve landing pages, offers and demo flows\nSet up and check conversion tracking',
     requirements: '2+ years running paid campaigns\nA working understanding of conversion tracking\nClear written and spoken English\nClient management skills',
     nice_to_have: 'Experience with long sales cycles and multiple decision-makers\nHubSpot or Salesforce experience\nExperience running campaigns for the US or Canada',
-    questions: [
-      { id: 'q_years', label: 'Years running paid campaigns', type: 'single', required: true, options: ['Under 2', '2–3', '4–5', '6+'] },
-      { id: 'q_platforms', label: 'Platforms you’ve managed yourself', type: 'multi', required: true, options: ['Meta', 'Google Ads', 'LinkedIn', 'Microsoft Ads', 'Other'] },
-      { id: 'q_budget', label: 'Largest monthly ad budget you’ve managed (USD)', type: 'single', required: true, options: ['Under $5,000', '$5,000–$19,999', '$20,000–$49,999', '$50,000+'] },
-      { id: 'q_tracking', label: 'Conversion tracking you’ve set up yourself', type: 'multi', required: true, options: ['Google Tag Manager', 'GA4', 'Meta Pixel or CAPI', 'Offline conversions', 'None'] },
-      { id: 'q_b2b', label: 'B2B experience', type: 'single', required: true, options: ['Mostly B2B', 'Some B2B', 'None'] },
-      { id: 'q_region', label: 'Have you run campaigns for the US or Canada?', type: 'single', required: true, options: ['Yes', 'No'] },
-      { id: 'q_crm', label: 'HubSpot or Salesforce experience', type: 'single', required: true, options: ['HubSpot', 'Salesforce', 'Both', 'Neither'] },
-      { id: 'q_story', label: 'Tell us about a campaign you improved. What did you change, and what happened to the numbers?', type: 'long', required: true, options: [] },
-    ],
   };
 }

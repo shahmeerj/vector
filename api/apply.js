@@ -31,20 +31,11 @@ function validate(body) {
     name: line(body.name, 120),
     email: line(body.email, 200).toLowerCase(),
     whatsapp: line(body.whatsapp, 30),
-    location: line(body.location, 120),
-    linkedin: line(body.linkedin, 300),
-    salary: line(body.salary, 120),
-    start: line(body.start, 120),
   };
   const errors = {};
   if (a.name.length < 2) errors.name = 'Add your full name.';
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(a.email)) errors.email = 'Add a valid email.';
   if (!/^\+?[\d\s()-]{7,25}$/.test(a.whatsapp)) errors.whatsapp = 'Add a valid number, with country code.';
-  if (a.location.length < 2) errors.location = 'Add your city and country.';
-  if (!/linkedin\.com\/\S+/i.test(a.linkedin)) errors.linkedin = 'Add a link to your LinkedIn profile.';
-  if (!a.salary) errors.salary = 'Add your expected salary.';
-  if (!a.start) errors.start = 'Add when you could start.';
-  if (body.consent !== true) errors.consent = 'We need your agreement to store your application.';
   return { a, errors };
 }
 
@@ -72,7 +63,6 @@ module.exports = async (req, res) => {
 
   const application = {
     ...a,
-    answers: (body.answers && typeof body.answers === 'object') ? body.answers : {},
     submission_id: line(body.submission_id, 80),
     source: line(body.source, 200),
     landing: line(body.landing, 300),
@@ -85,7 +75,6 @@ module.exports = async (req, res) => {
     // resend, and submission_id stops that creating a second row.
     const result = await callSheet('apply', { job_id: line(body.job_id, 80), application, cv }, { timeout: 27000, retries: 0 });
     if (result.ok) return res.status(200).json({ ok: true });
-    if (result.errors) return res.status(400).json({ ok: false, errors: result.errors });
     if (result.error === 'closed' || result.error === 'not found') {
       return res.status(409).json({ ok: false, error: 'This role is no longer open.' });
     }
