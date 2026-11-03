@@ -5,8 +5,10 @@ Static site for meetvector.co (Vector).
 - `index.html` — landing page
 - `tamba.html`, `personology.html`, `routines.html` — case studies
 - `assets/` — shared CSS, JS and favicon
+- `admin.html` — job listings admin (`/admin`)
 - `api/lead.js` — serverless endpoint behind the "Request a call" form
-- `scripts/` — the Google Apps Script for leads, and the case-study embed script
+- `api/careers.js`, `api/apply.js`, `api/admin.js`, `lib/` — careers pages, applications and admin
+- `scripts/` — the Google Apps Scripts for leads and careers, and the case-study embed script
 
 No build step. Deployed on Vercel; every push to `main` redeploys.
 
@@ -72,3 +74,47 @@ Received (UTC) · Name · Email · Website · Domain · Free email? · Email mat
 site? · CTA clicked · CTA page · Form page · Landing page · Referrer · utm_* ·
 gclid · li_fat_id · Country · Region · City · Timezone · IP · User agent ·
 Status (starts as `New`) · Notes (flags repeat submissions)
+
+## Careers
+
+`/careers` lists open roles and `/careers/<role>` shows the post and application
+form. Listings are managed at `/admin`. Everything lives in one Google Sheet,
+separate from the leads Sheet: a `Jobs` tab, plus one applications tab per role
+(created on the first application). Each role-specific question gets its own
+column. CVs go to a Drive folder called `Vector job applications`, and each row
+links to its CV. Drive files stay private to the Google account that owns the
+script unless you share the folder.
+
+Don't edit the `Jobs` tab by hand; use `/admin`. Changing the Status column or
+adding notes on an applications tab is fine.
+
+Job pages are cached for about a minute, so published edits can take a minute or
+two to appear. CVs are limited to 3 MB because Vercel caps request bodies at
+4.5 MB.
+
+### One-time setup
+
+1. **Sheet.** Create a new Google Sheet, for example "Vector careers". Open
+   **Extensions → Apps Script**, replace the default code with
+   `scripts/careers-apps-script.gs`, and set `SECRET` (any long random string)
+   and `NOTIFY_EMAIL` at the top.
+2. **Permissions.** Run the `testSetup` function once and approve the
+   permissions (Sheets, Drive and email). You should get a "setup OK" email, a
+   `Jobs` tab holding the first draft listing, and a `Vector job applications`
+   folder in Drive.
+3. **Deploy.** **Deploy → New deployment → Web app.** Execute as **Me**; who has
+   access: **Anyone**. Copy the URL (ends in `/exec`). Opening it should show
+   `{"ok":true,"service":"vector-careers"}`.
+4. **Vercel.** In the `vector` project, **Settings → Environment Variables**,
+   add for Production and Preview:
+   - `CAREERS_WEBHOOK_URL` — the `/exec` URL
+   - `CAREERS_WEBHOOK_SECRET` — the same value as `SECRET` in the script
+   - `ADMIN_PASSWORD` — the `/admin` password, at least 12 characters (use a long
+     random one; changing it signs everyone out)
+
+   Redeploy once so the functions pick them up.
+5. **Test.** Sign in at `/admin`, publish the draft, submit a test application,
+   then check the row, the CV and the email.
+
+To change the script later, edit it in Apps Script, then **Deploy → Manage
+deployments → Edit → Version: New version → Deploy**. The URL stays the same.
