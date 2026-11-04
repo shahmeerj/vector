@@ -2,18 +2,36 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/careers", "destination": "/api/careers" },
-    { "source": "/careers/:slug", "destination": "/api/careers?slug=:slug" }
+    {
+      "source": "/careers",
+      "destination": "/api/careers"
+    },
+    {
+      "source": "/careers/:slug/apply",
+      "destination": "/api/careers?slug=:slug&apply=1"
+    },
+    {
+      "source": "/careers/:slug",
+      "destination": "/api/careers?slug=:slug"
+    }
   ],
   "functions": {
-    "api/apply.js": { "maxDuration": 30 }
+    "api/apply.js": {
+      "maxDuration": 30
+    }
   },
   "headers": [
     {
       "source": "/admin",
       "headers": [
-        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
-        { "key": "Cache-Control", "value": "no-store" }
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
       ]
     }
   ]

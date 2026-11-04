@@ -77,13 +77,20 @@ Status (starts as `New`) · Notes (flags repeat submissions)
 
 ## Careers
 
-`/careers` lists open roles and `/careers/<role>` shows the post and application
-form. Listings are managed at `/admin`. Everything lives in one Google Sheet,
-separate from the leads Sheet: a `Jobs` tab, plus one applications tab per role
-(created on the first application). Applicants give their name, email, WhatsApp
-number and CV. CVs go to a Drive folder called `Vector job applications`, and each row
-links to its CV. Drive files stay private to the Google account that owns the
-script unless you share the folder.
+`/careers` has a short intro, an About Vector section and the open roles.
+Each role opens in place to show the full post; `/careers/<role>` links straight
+to a role with it opened. **Apply now** goes to `/careers/<role>/apply`, a short
+form that is the same for every role: full name, date of birth, current city,
+email, phone number, LinkedIn (optional), notice period, expected monthly
+salary in PKR (optional) and CV. Listings are managed at `/admin`.
+
+Everything lives in one Google Sheet, separate from the leads Sheet: a `Jobs`
+tab, plus one applications tab per role (created on the first application, with
+the applicant's age worked out from their date of birth). CVs go to a Drive
+folder called `Vector job applications`, and each row links to its CV. Drive
+files stay private to the Google account that owns the script unless you share
+the folder. If a column is added to the form later, existing tabs get it added
+at the end of their header row.
 
 Don't edit the `Jobs` tab by hand; use `/admin`. Changing the Status column or
 adding notes on an applications tab is fine.

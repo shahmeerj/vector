@@ -65,7 +65,7 @@ function load(){
   }).catch(function(){login('Couldn’t connect. Try again.');});
 }
 
-function blankJob(){return{title:'',status:'Draft',location:'',work_type:'',employment_type:'',salary:'',intro:'',responsibilities:'',requirements:'',nice_to_have:''};}
+function blankJob(){return{title:'',status:'Draft',location:'Karachi, Pakistan',work_type:'Hybrid',employment_type:'Full-time',salary:'',intro:'',responsibilities:'',requirements:'',nice_to_have:''};}
 
 function subline(j){
   var n=Number(j.applications)||0;
