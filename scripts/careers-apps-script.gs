@@ -22,7 +22,11 @@ const JOB_COLUMNS = [
   'apply_tab', 'created_at', 'updated_at', 'published_at',
 ];
 
-const TAB_COLUMNS = ['Received (UTC)', 'Name', 'Email', 'WhatsApp', 'CV', 'Source', 'Landing page', 'Referrer', 'IP country', 'Status', 'Notes'];
+const TAB_COLUMNS = [
+  'Received (UTC)', 'Name', 'Email', 'WhatsApp', 'Date of birth', 'Age', 'City', 'LinkedIn',
+  'Notice period', 'Expected salary (PKR)', 'CV', 'Status', 'Notes',
+  'Source', 'Landing page', 'Referrer', 'IP country',
+];
 
 function doPost(e) {
   try {
@@ -161,6 +165,12 @@ function apply_(body) {
       'Name': text_(a.name),
       'Email': text_(a.email),
       'WhatsApp': text_(a.whatsapp),
+      'Date of birth': text_(a.dob),
+      'Age': text_(a.age),
+      'City': text_(a.city),
+      'LinkedIn': text_(a.linkedin),
+      'Notice period': text_(a.notice),
+      'Expected salary (PKR)': text_(a.salary),
       'CV': '=HYPERLINK("' + cvUrl + '","Open CV")',
       'Source': text_(a.source),
       'Landing page': text_(a.landing),
@@ -169,7 +179,9 @@ function apply_(body) {
       'Status': 'New',
       'Notes': previous ? 'Applied before (' + previous + 'x)' : '',
     };
-    tab.appendRow(TAB_COLUMNS.map((label) => values[label]));
+    // Rows follow the tab's own header, so tabs made before a column was added still line up.
+    const header = ensureColumns_(tab);
+    tab.appendRow(header.map((label) => (label in values ? values[label] : '')));
     sheetUrl = tab.getParent().getUrl() + '#gid=' + tab.getSheetId();
   } finally {
     lock.releaseLock();
@@ -205,10 +217,24 @@ function applicationsTab_(job) {
   return tab;
 }
 
+// Adds any missing columns to the end of the header row and returns the header.
+function ensureColumns_(tab) {
+  const width = Math.max(tab.getLastColumn(), 1);
+  const header = tab.getRange(1, 1, 1, width).getValues()[0].map(String).filter(Boolean);
+  const missing = TAB_COLUMNS.filter((c) => header.indexOf(c) === -1);
+  if (missing.length) {
+    tab.getRange(1, header.length + 1, 1, missing.length).setValues([missing]).setFontWeight('bold');
+    return header.concat(missing);
+  }
+  return header;
+}
+
 function countEmail_(tab, email) {
   const last = tab.getLastRow();
   if (last < 2) return 0;
-  const col = TAB_COLUMNS.indexOf('Email') + 1;
+  const header = tab.getRange(1, 1, 1, Math.max(tab.getLastColumn(), 1)).getValues()[0].map(String);
+  const col = header.indexOf('Email') + 1;
+  if (!col) return 0;
   const target = String(email).toLowerCase();
   return tab.getRange(2, col, last - 1, 1).getValues().filter(([v]) => String(v).toLowerCase() === target).length;
 }
@@ -234,6 +260,11 @@ function sendEmail_(job, a, cvUrl, previous, sheetUrl) {
     '',
     'Email:     ' + a.email,
     'WhatsApp:  ' + a.whatsapp,
+    'Age:       ' + (a.age || '') + (a.dob ? ' (born ' + a.dob + ')' : ''),
+    'City:      ' + (a.city || ''),
+    'Notice:    ' + (a.notice || ''),
+    'Salary:    ' + (a.salary ? 'PKR ' + a.salary + ' a month' : 'Not given'),
+    'LinkedIn:  ' + (a.linkedin || 'Not given'),
     'Source:    ' + (a.source || 'Direct'),
     '',
   ];
@@ -275,9 +306,9 @@ function firstJob_() {
   return {
     title: 'B2B Performance Marketing Specialist',
     status: 'Draft',
-    location: '',
-    work_type: '',
-    employment_type: '',
+    location: 'Karachi, Pakistan',
+    work_type: 'Hybrid',
+    employment_type: 'Full-time',
     salary: '',
     intro: 'Vector runs paid acquisition, landing pages and attribution for B2B companies.\nWe keep our client list short so our specialists can work closely with each account. You’ll manage campaigns day to day and take on more ownership as you grow.',
     responsibilities: 'Launch and manage campaigns on Meta, Google Ads, LinkedIn, Microsoft Ads and more\nTest ad creative and recommend budget changes every week\nHelp improve landing pages, offers and demo flows\nSet up and check conversion tracking',

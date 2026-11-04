@@ -26,16 +26,58 @@ function checkCv(cv) {
   return { cv: { ext, mime: type.mime, base64 } };
 }
 
+const NOTICE = ['Can start now', '2 weeks', '1 month', '2 months', '3 months or more'];
+
+// Date of birth as YYYY-MM-DD; returns the age in whole years, or null.
+function ageFrom(dob, now = new Date()) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dob);
+  if (!m) return null;
+  const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
+  const date = new Date(Date.UTC(y, mo - 1, d));
+  if (date.getUTCFullYear() !== y || date.getUTCMonth() !== mo - 1 || date.getUTCDate() !== d) return null;
+  let age = now.getUTCFullYear() - y;
+  if (now.getUTCMonth() < mo - 1 || (now.getUTCMonth() === mo - 1 && now.getUTCDate() < d)) age -= 1;
+  return age;
+}
+
+function cleanUrl(v) {
+  if (!v) return '';
+  const u = /^https?:\/\//i.test(v) ? v : `https://${v}`;
+  try {
+    const url = new URL(u);
+    return /^https?:$/.test(url.protocol) && url.hostname.includes('.') ? url.href : null;
+  } catch { return null; }
+}
+
 function validate(body) {
   const a = {
     name: line(body.name, 120),
     email: line(body.email, 200).toLowerCase(),
     whatsapp: line(body.whatsapp, 30),
+    dob: line(body.dob, 10),
+    city: line(body.city, 80),
+    linkedin: line(body.linkedin, 300),
+    notice: line(body.notice, 40),
+    salary: line(body.salary, 20),
   };
   const errors = {};
   if (a.name.length < 2) errors.name = 'Add your full name.';
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(a.email)) errors.email = 'Add a valid email.';
   if (!/^\+?[\d\s()-]{7,25}$/.test(a.whatsapp)) errors.whatsapp = 'Add a valid number, with country code.';
+  const age = ageFrom(a.dob);
+  if (age === null) errors.dob = 'Add your date of birth.';
+  else if (age < 16 || age > 80) errors.dob = 'Check your date of birth.';
+  else a.age = String(age);
+  if (a.city.length < 2) errors.city = 'Add the city you live in.';
+  const linkedin = cleanUrl(a.linkedin);
+  if (linkedin === null) errors.linkedin = 'Add a full link, or leave it blank.';
+  else a.linkedin = linkedin;
+  if (!NOTICE.includes(a.notice)) errors.notice = 'Choose your notice period.';
+  if (a.salary) {
+    const digits = a.salary.replace(/[,\s]/g, '');
+    if (!/^\d{1,9}$/.test(digits)) errors.salary = 'Use numbers only, or leave it blank.';
+    else a.salary = Number(digits).toLocaleString('en-US');
+  }
   return { a, errors };
 }
 
