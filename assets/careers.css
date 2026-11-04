@@ -109,11 +109,6 @@
 .f input[type=date]{min-height:51px}
 .f input[type=date].empty{color:var(--dim)}
 .f input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.6);cursor:pointer}
-.sel{position:relative}
-.sel::after{content:"";position:absolute;right:4px;top:17px;width:7px;height:7px;border-right:1.5px solid var(--ash);border-bottom:1.5px solid var(--ash);transform:rotate(45deg);pointer-events:none}
-.f select{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:24px}
-.f select option{background:var(--ink-2);color:var(--bone)}
-.f select.empty{color:var(--dim)}
 .f .err{font-size:13px;color:#F38B8E}
 .f .err:empty{display:none}
 .f.bad input:not([type=file]),.f.bad select{border-bottom-color:var(--leak)}

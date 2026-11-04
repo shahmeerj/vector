@@ -26,8 +26,6 @@ function checkCv(cv) {
   return { cv: { ext, mime: type.mime, base64 } };
 }
 
-const NOTICE = ['Can start now', '2 weeks', '1 month', '2 months', '3 months or more'];
-
 // Date of birth as YYYY-MM-DD; returns the age in whole years, or null.
 function ageFrom(dob, now = new Date()) {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dob);
@@ -72,7 +70,7 @@ function validate(body) {
   const linkedin = cleanUrl(a.linkedin);
   if (linkedin === null) errors.linkedin = 'Add a full link, or leave it blank.';
   else a.linkedin = linkedin;
-  if (!NOTICE.includes(a.notice)) errors.notice = 'Choose your notice period.';
+  if (a.notice.length < 1) errors.notice = 'Add your notice period.';
   if (a.salary) {
     const digits = a.salary.replace(/[,\s]/g, '');
     if (!/^\d{1,9}$/.test(digits)) errors.salary = 'Use numbers only, or leave it blank.';

@@ -71,7 +71,7 @@ var form=document.getElementById('applyForm');if(!form)return;
 var MAX=3*1024*1024,EXT=/\.(pdf|docx?)$/i;
 var btn=document.getElementById('applyBtn'),btnText=btn.querySelector('.fb-t'),note=document.getElementById('applyNote');
 var cvInput=document.getElementById('ap-cv'),drop=document.getElementById('cvDrop'),cvText=document.getElementById('cvText');
-var dob=document.getElementById('ap-dob'),notice=document.getElementById('ap-notice');
+var dob=document.getElementById('ap-dob');
 var cv=null;
 /* Kept across retries so a resend after a timeout can't add a second row. */
 var submissionId=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Date.now())+Math.random().toString(36).slice(2);
@@ -79,7 +79,7 @@ var submissionId=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(D
 /* Applicants must be at least 16. */
 var t=new Date();dob.max=new Date(Date.UTC(t.getFullYear()-16,t.getMonth(),t.getDate())).toISOString().slice(0,10);
 var tint=function(el){el.classList.toggle('empty',!el.value);};
-[dob,notice].forEach(function(el){tint(el);el.addEventListener('change',function(){tint(el);});el.addEventListener('input',function(){tint(el);});});
+[dob].forEach(function(el){tint(el);el.addEventListener('change',function(){tint(el);});el.addEventListener('input',function(){tint(el);});});
 
 function fieldEl(id){return form.querySelector('[data-field="'+id+'"]');}
 function setError(id,msg){
@@ -125,7 +125,7 @@ function validate(){
   check('phone',/^\+?[\d\s()-]{7,25}$/.test(val('phone')),'Add a valid number, with country code.');
   var li=val('linkedin');
   check('linkedin',!li||/^(https?:\/\/)?[^\s/]+\.[^\s]+$/i.test(li),'Add a full link, or leave it blank.');
-  check('notice',!!val('notice'),'Choose your notice period.');
+  check('notice',!!val('notice'),'Add your notice period.');
   var s=val('salary').replace(/[,\s]/g,'');
   check('salary',!s||/^\d{1,9}$/.test(s),'Use numbers only, or leave it blank.');
   check('cv',!!cv,'Add your CV.');
