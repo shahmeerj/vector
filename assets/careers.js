@@ -3,6 +3,21 @@
 (function(){
 "use strict";
 
+/* ---------- reveal on scroll ---------- */
+(function(){
+  var d=document.documentElement;if(!d.classList.contains('cmo'))return;d.classList.add('cmo-ready');
+  var els=[].slice.call(document.querySelectorAll('[data-rv]'));
+  if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in');});return;}
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{rootMargin:'0px 0px -8% 0px'});
+  els.forEach(function(e,i){e.style.transitionDelay=(e.getBoundingClientRect().top<innerHeight?Math.min(i,4)*90:0)+'ms';io.observe(e);});
+})();
+
+/* ---------- apply page: glow follows the pointer ---------- */
+(function(){
+  var sec=document.querySelector('.ap-body');if(!sec)return;
+  sec.addEventListener('pointermove',function(e){var r=sec.getBoundingClientRect();sec.style.setProperty('--gx',(e.clientX-r.left)+'px');sec.style.setProperty('--gy',(e.clientY-r.top)+'px');});
+})();
+
 /* ---------- hero background: drifting blue dots (same as the audit page) ---------- */
 (function(){
   var cv=document.getElementById('amb');if(!cv||!cv.getContext)return;
@@ -75,12 +90,14 @@ function setError(id,msg){
 function val(name){var i=form.querySelector('[name="'+name+'"]');return i?i.value.trim():'';}
 
 function pickFile(file){
+  var hint=drop.querySelector('.drop-h');hint.textContent=hint.dataset.t||(hint.dataset.t=hint.textContent);
   setError('cv','');cv=null;drop.classList.remove('has');cvText.textContent='Upload your CV';
   if(!file)return;
   if(!EXT.test(file.name)){setError('cv','Upload a PDF or Word file.');return;}
   if(file.size>MAX){setError('cv','Your CV must be under 3 MB.');return;}
   if(!file.size){setError('cv','That file is empty.');return;}
   cv=file;cvText.textContent=file.name;drop.classList.add('has');
+  hint.textContent=Math.max(1,Math.round(file.size/1024))+' KB. Click or drop another file to replace it.';
 }
 cvInput.addEventListener('change',function(){pickFile(cvInput.files[0]);});
 ['dragenter','dragover'].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.add('over');});});
