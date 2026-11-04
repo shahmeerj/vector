@@ -81,7 +81,7 @@ Status (starts as `New`) · Notes (flags repeat submissions)
 Each role opens in place to show the full post; `/careers/<role>` links straight
 to a role with it opened. **Apply now** goes to `/careers/<role>/apply`, a short
 form that is the same for every role: full name, date of birth, current city,
-email, WhatsApp number, LinkedIn (optional), notice period, expected monthly
+email, phone number, LinkedIn (optional), notice period, expected monthly
 salary in PKR (optional) and CV. Listings are managed at `/admin`.
 
 Everything lives in one Google Sheet, separate from the leads Sheet: a `Jobs`

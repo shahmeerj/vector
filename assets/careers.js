@@ -122,7 +122,7 @@ function validate(){
   check('dob',a!==null&&a>=16&&a<=80,a===null?'Add your date of birth.':'Check your date of birth.');
   check('city',val('city').length>=2,'Add the city you live in.');
   check('email',/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(val('email')),'Add a valid email.');
-  check('whatsapp',/^\+?[\d\s()-]{7,25}$/.test(val('whatsapp')),'Add a valid number, with country code.');
+  check('phone',/^\+?[\d\s()-]{7,25}$/.test(val('phone')),'Add a valid number, with country code.');
   var li=val('linkedin');
   check('linkedin',!li||/^(https?:\/\/)?[^\s/]+\.[^\s]+$/i.test(li),'Add a full link, or leave it blank.');
   check('notice',!!val('notice'),'Choose your notice period.');
@@ -168,7 +168,7 @@ form.addEventListener('submit',function(e){
     var a=attribution();
     return fetch('/api/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
       job_id:form.dataset.job,submission_id:submissionId,
-      name:val('name'),dob:val('dob'),city:val('city'),email:val('email'),whatsapp:val('whatsapp'),
+      name:val('name'),dob:val('dob'),city:val('city'),email:val('email'),phone:val('phone'),
       linkedin:val('linkedin'),notice:val('notice'),salary:val('salary'),company_phone:val('company_phone'),
       cv:{name:cv.name,base64:base64},source:a.source,landing:a.landing,referrer:a.referrer
     })});

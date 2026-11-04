@@ -23,7 +23,7 @@ const JOB_COLUMNS = [
 ];
 
 const TAB_COLUMNS = [
-  'Received (UTC)', 'Name', 'Email', 'WhatsApp', 'Date of birth', 'Age', 'City', 'LinkedIn',
+  'Received (UTC)', 'Name', 'Email', 'Phone', 'Date of birth', 'Age', 'City', 'LinkedIn',
   'Notice period', 'Expected salary (PKR)', 'CV', 'Status', 'Notes',
   'Source', 'Landing page', 'Referrer', 'IP country',
 ];
@@ -164,7 +164,7 @@ function apply_(body) {
       'Received (UTC)': new Date().toISOString(),
       'Name': text_(a.name),
       'Email': text_(a.email),
-      'WhatsApp': text_(a.whatsapp),
+      'Phone': text_(a.phone),
       'Date of birth': text_(a.dob),
       'Age': text_(a.age),
       'City': text_(a.city),
@@ -259,7 +259,7 @@ function sendEmail_(job, a, cvUrl, previous, sheetUrl) {
     a.name + ' applied for ' + job.title + '.',
     '',
     'Email:     ' + a.email,
-    'WhatsApp:  ' + a.whatsapp,
+    'Phone:     ' + a.phone,
     'Age:       ' + (a.age || '') + (a.dob ? ' (born ' + a.dob + ')' : ''),
     'City:      ' + (a.city || ''),
     'Notice:    ' + (a.notice || ''),

@@ -53,7 +53,7 @@ function validate(body) {
   const a = {
     name: line(body.name, 120),
     email: line(body.email, 200).toLowerCase(),
-    whatsapp: line(body.whatsapp, 30),
+    phone: line(body.phone, 30),
     dob: line(body.dob, 10),
     city: line(body.city, 80),
     linkedin: line(body.linkedin, 300),
@@ -63,7 +63,7 @@ function validate(body) {
   const errors = {};
   if (a.name.length < 2) errors.name = 'Add your full name.';
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(a.email)) errors.email = 'Add a valid email.';
-  if (!/^\+?[\d\s()-]{7,25}$/.test(a.whatsapp)) errors.whatsapp = 'Add a valid number, with country code.';
+  if (!/^\+?[\d\s()-]{7,25}$/.test(a.phone)) errors.phone = 'Add a valid number, with country code.';
   const age = ageFrom(a.dob);
   if (age === null) errors.dob = 'Add your date of birth.';
   else if (age < 16 || age > 80) errors.dob = 'Check your date of birth.';
