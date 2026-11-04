@@ -3,6 +3,27 @@
 (function(){
 "use strict";
 
+/* ---------- hero background: drifting blue dots (same as the audit page) ---------- */
+(function(){
+  var cv=document.getElementById('amb');if(!cv||!cv.getContext)return;
+  var hero=cv.parentElement,ctx=cv.getContext('2d'),W=0,H=0,ps=[],t=0,run=true;
+  var RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var fieldA=function(x,y){return Math.sin(x*.004+t*.0003)*1.3+Math.cos(y*.005-t*.00025)*1.1;};
+  function spawn(p,init){p.x=init?Math.random()*W:-10;p.y=Math.random()*H;p.vx=(Math.random()-.5)*.4;p.vy=(Math.random()-.5)*.4;p.r=.7+Math.random()*1.2;p.a=.25+Math.random()*.55;p.b=Math.random()<.22;}
+  function size(){var hr=hero.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);W=hr.width;H=hr.height;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
+    var n=W<760?140:320;ps=[];for(var i=0;i<n;i++){var p={};spawn(p,true);ps.push(p);}}
+  function frame(){t+=16;ctx.clearRect(0,0,W,H);
+    for(var i=0;i<ps.length;i++){var p=ps[i],a=fieldA(p.x,p.y);p.vx+=Math.cos(a)*.012+.004;p.vy+=Math.sin(a)*.012;p.vx*=.97;p.vy*=.97;p.x+=p.vx;p.y+=p.vy;
+      if(p.x>W+10||p.y<-10||p.y>H+10)spawn(p,false);
+      ctx.fillStyle=p.b?'rgba(59,130,246,'+(p.a+.2)+')':'rgba(130,160,235,'+p.a*.6+')';ctx.beginPath();ctx.arc(p.x,p.y,p.b?p.r+.5:p.r,0,7);ctx.fill();}
+  }
+  size();frame();
+  if(RM)return;
+  (function loop(){if(run)frame();requestAnimationFrame(loop);})();
+  var rt;addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(size,200);});
+  if('IntersectionObserver' in window)new IntersectionObserver(function(e){run=e[0].isIntersecting;}).observe(hero);
+})();
+
 /* ---------- roles ---------- */
 var roles=[].slice.call(document.querySelectorAll('.role'));
 if(roles.length){
@@ -28,17 +49,6 @@ if(roles.length){
   var first=document.querySelector('.role.open');
   if(first)requestAnimationFrame(function(){window.scrollTo({top:scrollY+first.getBoundingClientRect().top-90});});
 
-  var toast;
-  document.addEventListener('click',function(e){
-    var b=e.target.closest&&e.target.closest('.copy-link');if(!b)return;
-    var url=b.dataset.url;
-    var done=function(){
-      if(!toast){toast=document.createElement('div');toast.className='toast';toast.setAttribute('role','status');document.body.appendChild(toast);}
-      toast.textContent='Link copied';toast.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(function(){toast.classList.remove('on');},1800);
-    };
-    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(url).then(done,function(){prompt('Copy this link',url);});
-    else prompt('Copy this link',url);
-  });
 }
 
 /* ---------- application form ---------- */

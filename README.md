@@ -77,7 +77,7 @@ Status (starts as `New`) · Notes (flags repeat submissions)
 
 ## Careers
 
-`/careers` introduces Vector, explains how hiring works and lists open roles.
+`/careers` has a short intro, an About Vector section and the open roles.
 Each role opens in place to show the full post; `/careers/<role>` links straight
 to a role with it opened. **Apply now** goes to `/careers/<role>/apply`, a short
 form that is the same for every role: full name, date of birth, current city,
