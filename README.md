@@ -125,3 +125,21 @@ two to appear. CVs are limited to 3 MB because Vercel caps request bodies at
 
 To change the script later, edit it in Apps Script, then **Deploy → Manage
 deployments → Edit → Version: New version → Deploy**. The URL stays the same.
+
+## EGO style prediction (`/style-prediction-model`)
+
+Upload a drop's design images and get each design's predicted online units for
+its first 30 days, an 80% range, its rank in the drop and a split by city.
+
+- `style-prediction-model.html`, `assets/style-model.js`, `assets/style-model.css` — the page
+- `api/style-predict.js` — `GET` returns form options, `POST` scores a batch (up to 60 designs)
+- `lib/style-predict.js` — feature building and LightGBM tree evaluation
+- `lib/style-model.json` — the exported before-launch model, history lookups, store
+  sales calendar and city shares (built from EGO's Shopify data, 17 Nov 2026)
+
+Sign-in uses the `/admin` password and session cookie (`ADMIN_PASSWORD`), so no new
+environment variables are needed. The model only runs on the server; `/lib/*` is
+redirected so its files can't be downloaded directly. Images never leave the
+browser: they're used only to read each design's main colour.
+
+To refresh the model, re-run the EGO model export and replace `lib/style-model.json`.

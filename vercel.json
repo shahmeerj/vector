@@ -18,6 +18,9 @@
   "functions": {
     "api/apply.js": {
       "maxDuration": 30
+    },
+    "api/style-predict.js": {
+      "maxDuration": 15
     }
   },
   "headers": [
@@ -33,6 +36,26 @@
           "value": "no-store"
         }
       ]
+    },
+    {
+      "source": "/style-prediction-model",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/lib/:path*",
+      "destination": "/",
+      "permanent": false
     }
   ]
 }
