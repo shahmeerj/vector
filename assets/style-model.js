@@ -1,5 +1,6 @@
-/* /style-prediction-model: upload EGO designs, score them with the before-launch model
-   via /api/style-predict. Images stay in the browser; only the details are sent. */
+/* /style-prediction-model: upload EGO designs and score them with the before-launch model.
+   The model ships encrypted (/data/style-model.enc). The password unlocks it in the browser
+   (PBKDF2-SHA256 600k -> AES-256-GCM); everything, images included, stays on this device. */
 (function(){
 "use strict";
 var app=document.getElementById('app');
@@ -24,10 +25,39 @@ function h(sel,attrs){
   });
   return el;
 }
-function json(r){return r.json().catch(function(){return{ok:false,error:'Something went wrong. Try again.'};}).then(function(d){d._status=r.status;return d;});}
-function api(method,body){
-  return fetch('/api/style-predict',{method:method,credentials:'same-origin',headers:method==='POST'?{'Content-Type':'application/json','X-Vector-Admin':'1'}:{},body:body?JSON.stringify(body):undefined}).then(json);
+var scorer=null;
+var KEY_SLOT='vx_sp_key';
+function b64(buf){return btoa(String.fromCharCode.apply(null,new Uint8Array(buf)));}
+function unb64(s){return Uint8Array.from(atob(s),function(c){return c.charCodeAt(0);});}
+var blobPromise=null;
+function getBlob(){
+  if(!blobPromise)blobPromise=fetch('/data/style-model.enc',{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('fetch');return r.arrayBuffer();}).catch(function(e){blobPromise=null;throw e;});
+  return blobPromise;
 }
+function deriveKey(password,salt){
+  return crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveKey']).then(function(base){
+    return crypto.subtle.deriveKey({name:'PBKDF2',salt:salt,iterations:600000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},true,['decrypt']);
+  });
+}
+/* resolves with true when unlocked, false for a wrong password; rejects if the file can't be loaded */
+function unlock(password,rawKey){
+  return getBlob().then(function(buf){
+    var u=new Uint8Array(buf);
+    if(String.fromCharCode(u[0],u[1],u[2],u[3])!=='VSM1')throw new Error('format');
+    var salt=u.slice(4,20),iv=u.slice(20,32),ct=u.slice(32);
+    var keyP=rawKey?crypto.subtle.importKey('raw',unb64(rawKey),{name:'AES-GCM'},true,['decrypt']):deriveKey(password,salt);
+    return keyP.then(function(key){
+      return crypto.subtle.decrypt({name:'AES-GCM',iv:iv},key,ct).then(function(plain){
+        var stream=new Blob([plain]).stream().pipeThrough(new DecompressionStream('gzip'));
+        return new Response(stream).text().then(function(txt){
+          scorer=window.StylePredict.create(JSON.parse(txt));
+          return crypto.subtle.exportKey('raw',key).then(function(k){try{sessionStorage.setItem(KEY_SLOT,b64(k));}catch(e){}return true;});
+        });
+      },function(){return false;});
+    });
+  });
+}
+function lock(){scorer=null;try{sessionStorage.removeItem(KEY_SLOT);}catch(e){}}
 function store(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem('vx_sp_'+k)||'null');localStorage.setItem('vx_sp_'+k,JSON.stringify(v));}catch(e){return null;}}
 var fmt=function(n){return Math.round(n).toLocaleString('en-US');};
 var LABEL={na:'Not set',RTW:'RTW',UNSTITCHED:'Unstitched','LITTLE EGO':'Little EGO',VALUE:'Value',SOUL:'Soul',PREMIUM:'Premium',Core:'Core',Bottoms:'Bottoms',
@@ -95,10 +125,10 @@ function login(message){
   app.textContent='';
   app.appendChild(h('form.login',{onsubmit:function(e){
     e.preventDefault();btn.disabled=true;err.textContent='';
-    fetch('/api/admin',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-Vector-Admin':'1'},body:JSON.stringify({action:'login',password:pw.value})})
-      .then(json).then(function(d){btn.disabled=false;if(d.ok){boot();return;}err.textContent=d.error||'Sign-in failed.';pw.select();})
-      .catch(function(){btn.disabled=false;err.textContent='Couldn’t connect. Try again.';});
-  }},h('h1',{},'Style prediction'),h('p.sp-sub',{style:{marginBottom:'20px'}},'Sign in with the Vector admin password.'),
+    btn.textContent='Unlocking…';
+    unlock(pw.value).then(function(ok){btn.disabled=false;btn.textContent='Sign in';if(ok){boot();return;}err.textContent='Wrong password.';pw.select();})
+      .catch(function(){btn.disabled=false;btn.textContent='Sign in';err.textContent='Couldn’t load the model. Check your connection and try again.';});
+  }},h('h1',{},'Style prediction'),h('p.sp-sub',{style:{marginBottom:'20px'}},'Enter the style prediction password. The model unlocks in your browser.'),
     h('div.fld',{},h('label',{for:'pw'},'Password'),pw,err),btn));
   pw.focus();
 }
@@ -193,16 +223,16 @@ function predict(){
   if(missing.length){missing.forEach(function(d){d.bad=true;});renderDesigns();setMsg('Add a price for '+missing.length+' design'+(missing.length===1?'':'s')+' (outlined in red).','err');return;}
   if(!S.drop.launch_date){setMsg('Set the launch date.','err');return;}
   S.busy=true;updateBar();setMsg('Scoring '+S.designs.length+' designs…','');
-  api('POST',{launch_date:S.drop.launch_date,sale:S.drop.sale,other_styles:S.drop.other_styles,
+  var payload={launch_date:S.drop.launch_date,sale:S.drop.sale,other_styles:S.drop.other_styles,
     styles:S.designs.map(function(d){return{id:d.id,design:d.design,line:d.line,pieces:d.pieces,fabric:d.fabric,technique:d.technique,cut:d.cut,
-      season_tag:d.season_tag,colour:d.colour,price:Number(d.price),labels:d.collection?[d.collection]:[],eid:d.eid};})})
-  .then(function(r){
+      season_tag:d.season_tag,colour:d.colour,price:Number(d.price),labels:d.collection?[d.collection]:[],eid:d.eid};})};
+  setTimeout(function(){
     S.busy=false;
-    if(r._status===401){login('Your session ended. Sign in again.');return;}
-    if(!r.ok){setMsg(r.error||'Couldn’t score these designs.','err');updateBar();return;}
+    if(!scorer){login('Sign in again to continue.');return;}
+    try{var r=scorer.predictBatch(payload);}catch(e){setMsg('Couldn’t score these designs. Check the details and try again.','err');updateBar();return;}
     S.results=r.results;S.context=r.context;setMsg('Done. Results below.','good');renderResults();updateBar();
     resultsBox.scrollIntoView({behavior:'smooth',block:'start'});
-  }).catch(function(){S.busy=false;setMsg('Couldn’t connect. Try again.','err');updateBar();});
+  },30);
 }
 
 function cityUnits(r,key){var c=r.city.find(function(x){return x.city===key;});return c?c.units:0;}
@@ -293,7 +323,7 @@ function render(){
   var d=S.drop;
   app.appendChild(h('div.a-wrap.sp',{},
     h('div.a-top',{},h('span.a-brand',{},'Vector · EGO'),
-      h('nav',{},h('button.a-link',{type:'button',onclick:function(){fetch('/api/admin',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-Vector-Admin':'1'},body:'{"action":"logout"}'}).then(function(){login();});}},'Sign out'))),
+      h('nav',{},h('button.a-link',{type:'button',onclick:function(){lock();login();}},'Sign out'))),
     h('div.a-head',{},h('div',{},h('h1',{},'Style sales prediction'),
       h('p.sp-sub',{},'Upload a drop’s designs and get each one’s predicted online units for its first 30 days, a likely range, its rank in the drop and a split by city.'))),
     h('div.card',{},h('h2',{},'Drop'),h('p',{},'Applies to every design in this batch.'),
@@ -321,15 +351,17 @@ function render(){
 }
 
 function boot(){
-  app.textContent='';app.appendChild(h('div.login',{},h('p.sp-sub',{},'Loading…')));
-  api('GET').then(function(r){
-    if(r._status===401){login();return;}
-    if(!r.ok){app.textContent='';app.appendChild(h('div.login',{},h('h1',{},'Style prediction'),h('p.msg',{},r.error||'Couldn’t load.')));return;}
-    S.meta=r;
-    var saved=store('drop');if(saved)Object.assign(S.drop,saved);
-    if(!S.drop.launch_date||S.drop.launch_date<new Date().toISOString().slice(0,10))S.drop.launch_date=nextMonday();
-    render();
-  }).catch(function(){app.textContent='';app.appendChild(h('div.login',{},h('p.msg',{},'Couldn’t connect. Reload to try again.')));});
+  if(!scorer){
+    var k=null;try{k=sessionStorage.getItem(KEY_SLOT);}catch(e){}
+    if(!k){login();return;}
+    app.textContent='';app.appendChild(h('div.login',{},h('p.sp-sub',{},'Loading…')));
+    unlock(null,k).then(function(ok){if(ok)boot();else{lock();login();}}).catch(function(){login('Couldn’t load the model. Reload to try again.');});
+    return;
+  }
+  S.meta=scorer.meta();
+  var saved=store('drop');if(saved)Object.assign(S.drop,saved);
+  if(!S.drop.launch_date||S.drop.launch_date<new Date().toISOString().slice(0,10))S.drop.launch_date=nextMonday();
+  render();
 }
 boot();
 })();

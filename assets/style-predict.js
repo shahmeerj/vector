@@ -1,8 +1,8 @@
+/* Browser copy of the EGO style scorer. Loaded by assets/style-model.js after the model is decrypted. */
 // EGO style prediction: scores designs with the before-launch model exported from
-// the EGO sales model build (17 Nov 2026). Runs server-side only, so the model and
-// EGO's sales patterns never reach the browser. See api/style-predict.js.
+// the EGO sales model build (17 Nov 2026). create(MODEL) returns the scorer.
 
-const MODEL = require('./style-model.json');
+function create(MODEL) {
 
 const DAY = 86400000;
 const CAT_INDEX = {};
@@ -166,4 +166,7 @@ function meta() {
   };
 }
 
-module.exports = { predictBatch, meta, _internal: { predictRaw, vector, features, storeContext, MODEL } };
+return { predictBatch, meta, _internal: { predictRaw, vector, features, storeContext, MODEL } };
+}
+
+window.StylePredict = { create };
