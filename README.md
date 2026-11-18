@@ -128,20 +128,31 @@ deployments → Edit → Version: New version → Deploy**. The URL stays the sa
 
 ## EGO style prediction (`/style-prediction-model`)
 
-Upload a drop's design images and get each design's predicted online units for
-its first 30 days, an 80% range, its rank in the drop and a split by city.
+Rate a design 0-100, see the reasons, and get expected online units by city. Input is
+a product link, images, an optional description, or any mix.
 
 - `style-prediction-model.html`, `assets/style-model.js`, `assets/style-model.css` — the page
-- `assets/style-predict.js` — the scorer (feature building and LightGBM tree evaluation)
-- `data/style-model.enc` — the before-launch model, history lookups, store sales calendar
-  and city shares, built from EGO's Shopify data (17 Nov 2026)
+- `assets/style-predict.js` — the sales scorer (feature building and LightGBM tree
+  evaluation); runs in the browser
+- `data/style-model.enc` — the before-launch sales model, history lookups, store sales
+  calendar, city shares and score references, built from EGO's Shopify data
+- `api/style-rate.js` — reads a product link (Shopify product JSON or page metadata) and
+  asks Claude to read the image and review the design. Makes no sales predictions.
 
-Everything runs in the browser; there's no server side. `data/style-model.enc` is
-**encrypted** (gzip, then AES-256-GCM with a key derived from the page password by
-PBKDF2-SHA256, 600,000 iterations; layout `VSM1 | salt 16 | iv 12 | ciphertext+tag`),
-so it's safe in this public repo. Entering the password decrypts it in the browser;
-the derived key is kept in `sessionStorage` until the tab closes or **Sign out**.
+**Rating** = average of a sales-history score (where the predicted units rank among
+launches in the same line over the last 2 years) and Claude's design review score. If
+the review is unavailable the rating is the sales-history score alone.
 
-Never commit the decrypted model JSON here: the repo is public. To change the password
-or refresh the model, re-encrypt the JSON with the new password and replace the file.
-Images never leave the browser; they're used only to read each design's main colour.
+**Access.** `data/style-model.enc` is encrypted (gzip, then AES-256-GCM with a key derived
+from the page password by PBKDF2-SHA256, 600,000 iterations; layout
+`VSM1 | salt 16 | iv 12 | ciphertext+tag`), so it is safe in this public repo. The password
+decrypts it in the browser; the key stays in `sessionStorage` until the tab closes or
+**Sign out**. `api/style-rate.js` accepts a request only if the key it carries
+(`X-Style-Key`) decrypts that file, so there is no second password.
+
+**Environment.** `ANTHROPIC_API_KEY` (Vercel → Settings → Environment Variables) turns on
+the design review. Optional: `STYLE_AI_MODEL` (default `claude-sonnet-5-5`). Without the
+key, links, sales scores and units still work.
+
+Never commit the decrypted model JSON here: the repo is public. To change the password or
+refresh the model, re-encrypt the JSON (keep the layout above) and replace the file.

@@ -18,6 +18,10 @@
   "functions": {
     "api/apply.js": {
       "maxDuration": 30
+    },
+    "api/style-rate.js": {
+      "maxDuration": 60,
+      "includeFiles": "data/style-model.enc"
     }
   },
   "headers": [
