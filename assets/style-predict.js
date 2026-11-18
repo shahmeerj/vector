@@ -130,6 +130,8 @@ function predictBatch(input) {
   const others = Math.max(0, Math.min(500, Math.round(Number(input.other_styles) || 0)));
   ctx.drop_size = styles.length + others;
   ctx.drop_line = {};
+  // single: score one design as part of a typical EGO drop rather than a one-style drop
+  const single = !!input.single && MODEL.typical;
   const designCount = {};
   for (const s of styles) {
     ctx.drop_line[s.line] = (ctx.drop_line[s.line] || 0) + 1;
@@ -139,14 +141,24 @@ function predictBatch(input) {
   }
   const out = styles.map((s) => {
     const style = { ...s, n_colourways: designCount[s._key] };
-    const raw = predictRaw(vector(features(style, ctx)));
+    let c = ctx;
+    if (single) {
+      const dl = MODEL.typical.drop_size_line[style.line] || 5;
+      c = { ...ctx, drop_line: { [style.line]: dl }, drop_size: Math.max(MODEL.typical.drop_size, dl) };
+      style.n_colourways = Math.max(1, Number(s.colourways) || MODEL.typical.n_colourways);
+    }
+    const raw = predictRaw(vector(features(style, c)));
     const likely = units(raw.mid);
     const low = Math.min(units(raw.lo), likely);
     const high = Math.max(units(raw.hi), likely);
     const shares = MODEL.city.shares[style.line] || MODEL.city.shares._all;
     const city = Object.entries(shares).map(([c, sh]) => ({ city: c, units: likely * sh, share: sh }))
       .sort((a, b) => b.share - a.share);
-    return { id: s.id, likely, low, high, city, colourways: style.n_colourways };
+    // 0-100 sales score: where this prediction sits among EGO launches of the last 2 years
+    const ratio = likely / ctx.prior28;
+    const pct = (q) => { if (!q) return null; let i = 0; while (i < q.length && q[i] <= ratio) i++; return Math.max(0, Math.min(100, i - 1)); };
+    const score = MODEL.ref ? { all: pct(MODEL.ref.all), line: pct(MODEL.ref.line[style.line]) } : null;
+    return { id: s.id, likely, low, high, city, colourways: style.n_colourways, score };
   });
   const order = out.map((o, i) => [o.likely, i]).sort((a, b) => b[0] - a[0]);
   order.forEach(([, i], r) => { out[i].rank = r + 1; });
@@ -163,6 +175,7 @@ function meta() {
   return {
     version: MODEL.version, trained_on: MODEL.trained_on, options: MODEL.options, validation: MODEL.validation,
     cities: MODEL.city.cities, city_validation: MODEL.city.validation, markdown_levels: MODEL.store.markdown_levels,
+    index: MODEL.index || {},
   };
 }
 

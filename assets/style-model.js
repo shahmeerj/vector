@@ -1,10 +1,11 @@
-/* /style-prediction-model: upload EGO designs and score them with the before-launch model.
-   The model ships encrypted (/data/style-model.enc). The password unlocks it in the browser
-   (PBKDF2-SHA256 600k -> AES-256-GCM); everything, images included, stays on this device. */
+/* /style-prediction-model: rate a design 0-100, explain why, and predict units by city.
+   The sales model ships encrypted (/data/style-model.enc); the password unlocks it in the
+   browser (PBKDF2-SHA256 600k -> AES-256-GCM) and predictions run on this device.
+   /api/style-rate reads product links and asks Claude to review the image. */
 (function(){
 "use strict";
 var app=document.getElementById('app');
-var S={meta:null,designs:[],drop:{launch_date:'',sale:'auto',other_styles:0},results:null,context:null,busy:false,msg:'',msgType:''};
+var S={meta:null,items:[],drop:{launch_date:'',sale:'auto'},busy:false};
 var seq=0;
 
 /* ---------- helpers ---------- */
@@ -63,11 +64,9 @@ var fmt=function(n){return Math.round(n).toLocaleString('en-US');};
 var LABEL={na:'Not set',RTW:'RTW',UNSTITCHED:'Unstitched','LITTLE EGO':'Little EGO',VALUE:'Value',SOUL:'Soul',PREMIUM:'Premium',Core:'Core',Bottoms:'Bottoms',
   digital_print:'Digital print',embroidered:'Embroidered',screen_print:'Screen print',solid:'Solid / plain',other:'Other',print:'Print (other)',
   SUMMER:'Summer',SPRING:'Spring',FALL:'Fall',WINTER:'Winter','STRAIGHT CUT':'Straight','LOOSE CUT':'Loose','A-LINE CUT':'A-line',
-  '1':'1 piece','2':'2 piece','3':'3 piece','':'None',
+  '1':'1 piece','2':'2 piece','3':'3 piece','':'Choose…',
   auto:'Auto (last year’s sale calendar)',none:'No sale',normal:'Typical clearance sale',heavy:'Big sale (e.g. 11.11, EOSS)'};
 function lab(v){if(LABEL[v])return LABEL[v];return String(v).toLowerCase().replace(/(^|\s)\S/g,function(c){return c.toUpperCase();});}
-var COLLECTIONS=['diva','casuals','signature','everyday','luxury','festive','pulse','loud'];
-var CITY_COLS=[['karachi','Karachi'],['lahore','Lahore'],['islamabad','Islamabad'],['rawalpindi','Rawalpindi']];
 
 /* ---------- colour detection (runs on the image in the browser) ---------- */
 var PALETTE={BLACK:[22,22,24],CREAM:[240,229,200],WHITE:[246,246,244],PINK:[236,150,180],GREEN:[60,140,80],YELLOW:[240,210,60],'SKY BLUE':[135,195,235],
@@ -128,228 +127,227 @@ function login(message){
     btn.textContent='Unlocking…';
     unlock(pw.value).then(function(ok){btn.disabled=false;btn.textContent='Sign in';if(ok){boot();return;}err.textContent='Wrong password.';pw.select();})
       .catch(function(){btn.disabled=false;btn.textContent='Sign in';err.textContent='Couldn’t load the model. Check your connection and try again.';});
-  }},h('h1',{},'Style prediction'),h('p.sp-sub',{style:{marginBottom:'20px'}},'Enter the style prediction password. The model unlocks in your browser.'),
+  }},h('h1',{},'Style prediction'),h('p.sp-sub',{style:{marginBottom:'20px'}},'Enter the style prediction password.'),
     h('div.fld',{},h('label',{for:'pw'},'Password'),pw,err),btn));
   pw.focus();
 }
 
-/* ---------- designs ---------- */
-var DEFAULTS={line:'UNSTITCHED',pieces:'3',fabric:'na',technique:'digital_print',cut:'na',season_tag:'na',price:'',collection:'',eid:false};
-function nameFromFile(f){
-  return f.name.replace(/\.[a-z0-9]+$/i,'').replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim().slice(0,60);
-}
-function addFiles(files){
-  var list=[].slice.call(files||[]).filter(function(f){return /^image\//.test(f.type);});
-  if(!list.length){setMsg('Choose image files (JPG, PNG or WebP).','err');return;}
-  var room=60-S.designs.length;
-  if(list.length>room){setMsg('Up to 60 designs at a time. Added the first '+room+'.','err');list=list.slice(0,room);}
-  var batch=store('batch')||{};
-  list.forEach(function(f){
-    var d=Object.assign({},DEFAULTS,batch,{id:'d'+(++seq),url:URL.createObjectURL(f),file:f.name,design:nameFromFile(f),colour:'na',colourAuto:false});
-    S.designs.push(d);
-    var img=new Image();
-    img.onload=function(){var c=detectColour(img);if(c&&!d.colourTouched){d.colour=c;d.colourAuto=true;renderDesigns();}};
-    img.src=d.url;
-  });
-  S.results=null;
-  render();
-}
-function removeDesign(id){
-  var i=S.designs.findIndex(function(d){return d.id===id;});
-  if(i>=0){URL.revokeObjectURL(S.designs[i].url);S.designs.splice(i,1);}
-  S.results=null;render();
-}
+/* ---------- reading a design (link, images, description) ---------- */
 function sel(opts,value,onchange,id){
   return h('select',{id:id,onchange:function(e){onchange(e.target.value);}},opts.map(function(o){return h('option',{value:o,selected:String(o)===String(value)},lab(o));}));
 }
-function swatch(c){var p=PALETTE[c];return p?h('span.sw',{style:{background:'rgb('+p.join(',')+')'}}):null;}
-
-function designCard(d,i){
-  var o=S.meta.options,upd=function(k){return function(v){d[k]=v;S.results=null;markStale();};};
-  return h('div.dz'+(d.bad?'.bad':''),{},
-    h('div.dz-img',{},h('img',{src:d.url,alt:d.design}),h('span.dz-n',{},String(i+1)),
-      h('button.dz-x',{type:'button',title:'Remove','aria-label':'Remove '+d.design,onclick:function(){removeDesign(d.id);}},'×')),
-    h('div.dz-body',{},
-      h('div.fld.wide',{},h('label',{},'Design name'),h('input',{type:'text',value:d.design,oninput:function(e){d.design=e.target.value;markStale();}})),
-      h('div.fld.wide',{},h('label',{},'Colour',d.colourAuto?h('span.auto',{},'DETECTED · CHECK'):null),
-        h('div',{style:{display:'flex',alignItems:'center',gap:'6px'}},swatch(d.colour),
-          sel(o.colour,d.colour,function(v){d.colour=v;d.colourAuto=false;d.colourTouched=true;S.results=null;renderDesigns();}))),
-      h('div.fld',{},h('label',{},'Line'),sel(o.line,d.line,upd('line'))),
-      h('div.fld',{},h('label',{},'Pieces'),sel(o.pieces,d.pieces,upd('pieces'))),
-      h('div.fld',{},h('label',{},'Fabric'),sel(o.fabric,d.fabric,upd('fabric'))),
-      h('div.fld',{},h('label',{},'Technique'),sel(o.technique,d.technique,upd('technique'))),
-      h('div.fld',{},h('label',{},'Cut'),sel(o.cut,d.cut,upd('cut'))),
-      h('div.fld',{},h('label',{},'Season'),sel(o.season_tag,d.season_tag,upd('season_tag'))),
-      h('div.fld',{},h('label',{},'Price (Rs)'),h('input',{type:'number',min:'0',step:'10',value:d.price,inputmode:'numeric',oninput:function(e){d.price=e.target.value;d.bad=false;markStale();}})),
-      h('div.fld',{},h('label',{},'Collection'),sel([''].concat(COLLECTIONS),d.collection,upd('collection'))),
-      h('label.chk',{},h('input',{type:'checkbox',checked:d.eid,onchange:function(e){d.eid=e.target.checked;markStale();}}),'Eid collection')));
-}
-
-var designsBox,resultsBox,barMsg,barBtn;
-function renderDesigns(){
-  if(!designsBox)return;
-  designsBox.textContent='';
-  S.designs.forEach(function(d,i){designsBox.appendChild(designCard(d,i));});
-  updateBar();
-}
-function markStale(){if(resultsBox&&S.results===null&&resultsBox.firstChild){resultsBox.textContent='';}updateBar();}
-
-/* ---------- apply to all ---------- */
-function applyAllBox(){
-  var o=S.meta.options,v={line:'',pieces:'',fabric:'',technique:'',season_tag:'',price:''};
-  var ph=function(opts){return[''].concat(opts);};
-  var s=function(k,opts){return h('select',{onchange:function(e){v[k]=e.target.value;}},ph(opts).map(function(x){return h('option',{value:x},x===''?'—':lab(x));}));};
-  return h('div.applyall',{},h('h3',{},'Same for every design? Set it once'),
-    h('div.fields.six',{},
-      h('div.fld',{},h('label',{},'Line'),s('line',o.line)),
-      h('div.fld',{},h('label',{},'Pieces'),s('pieces',o.pieces)),
-      h('div.fld',{},h('label',{},'Fabric'),s('fabric',o.fabric)),
-      h('div.fld',{},h('label',{},'Technique'),s('technique',o.technique)),
-      h('div.fld',{},h('label',{},'Season'),s('season_tag',o.season_tag)),
-      h('div.fld',{},h('label',{},'Price (Rs)'),h('input',{type:'number',min:'0',step:'10',inputmode:'numeric',oninput:function(e){v.price=e.target.value;}}))),
-    h('div.row',{},h('button.btn.btn-line',{type:'button',onclick:function(){
-      var set={};Object.keys(v).forEach(function(k){if(v[k]!=='')set[k]=v[k];});
-      if(!Object.keys(set).length){setMsg('Pick at least one value to apply.','err');return;}
-      S.designs.forEach(function(d){Object.assign(d,set);d.bad=false;});
-      store('batch',Object.assign(store('batch')||{},set));
-      S.results=null;renderDesigns();markStale();setMsg('Applied to '+S.designs.length+' design'+(S.designs.length===1?'':'s')+'.','good');
-    }},'Apply to all designs')));
-}
-
-/* ---------- predict ---------- */
-function predict(){
-  if(!S.designs.length){setMsg('Add at least one design.','err');return;}
-  var missing=S.designs.filter(function(d){return !(Number(d.price)>0);});
-  if(missing.length){missing.forEach(function(d){d.bad=true;});renderDesigns();setMsg('Add a price for '+missing.length+' design'+(missing.length===1?'':'s')+' (outlined in red).','err');return;}
-  if(!S.drop.launch_date){setMsg('Set the launch date.','err');return;}
-  S.busy=true;updateBar();setMsg('Scoring '+S.designs.length+' designs…','');
-  var payload={launch_date:S.drop.launch_date,sale:S.drop.sale,other_styles:S.drop.other_styles,
-    styles:S.designs.map(function(d){return{id:d.id,design:d.design,line:d.line,pieces:d.pieces,fabric:d.fabric,technique:d.technique,cut:d.cut,
-      season_tag:d.season_tag,colour:d.colour,price:Number(d.price),labels:d.collection?[d.collection]:[],eid:d.eid};})};
-  setTimeout(function(){
-    S.busy=false;
-    if(!scorer){login('Sign in again to continue.');return;}
-    try{var r=scorer.predictBatch(payload);}catch(e){setMsg('Couldn’t score these designs. Check the details and try again.','err');updateBar();return;}
-    S.results=r.results;S.context=r.context;setMsg('Done. Results below.','good');renderResults();updateBar();
-    resultsBox.scrollIntoView({behavior:'smooth',block:'start'});
-  },30);
-}
-
-function cityUnits(r,key){var c=r.city.find(function(x){return x.city===key;});return c?c.units:0;}
-function restUnits(r){var big=CITY_COLS.map(function(c){return c[0];});return r.city.filter(function(x){return big.indexOf(x.city)<0;}).reduce(function(a,x){return a+x.units;},0);}
-
-function renderResults(){
-  resultsBox.textContent='';
-  if(!S.results)return;
-  var byId={};S.designs.forEach(function(d){byId[d.id]=d;});
-  var rows=S.results.slice().sort(function(a,b){return a.rank-b.rank;});
-  var n=rows.length,maxHi=Math.max.apply(null,rows.map(function(r){return r.high;}).concat([1]));
-  var tot={likely:0,low:0,high:0};rows.forEach(function(r){tot.likely+=r.likely;tot.low+=r.low;tot.high+=r.high;});
-  var ctx=S.context,basis={actual:'actual sales',last_year:'the same weeks last year, adjusted for this year’s demand',latest:'the last 28 days'}[ctx.store_basis];
-  var k20=Math.max(1,Math.round(n*0.2));
-  var trs=rows.map(function(r){
-    var d=byId[r.id]||{};
-    var tag=n>=5?(r.rank<=k20?h('span.tag.top',{},'Top 20%'):(r.rank>n-k20?h('span.tag.low',{},'Bottom 20%'):null)):null;
-    return h('tr',{},
-      h('td.num',{},String(r.rank)),
-      h('td',{},h('img.thumb',{src:d.url,alt:''})),
-      h('td',{},h('div.nm',{},d.design||'Design'),h('div.meta',{},[lab(d.line),lab(d.pieces),d.fabric!=='na'?lab(d.fabric):null,lab(d.colour),'Rs '+fmt(d.price)].filter(Boolean).join(' · ')+(r.colourways>1?' · '+r.colourways+' colourways':''))),
-      h('td.num',{},h('b',{},fmt(r.likely))),
-      h('td',{},h('div.rng',{},h('i',{style:{left:(r.low/maxHi*100)+'%',width:Math.max(1,(r.high-r.low)/maxHi*100)+'%'}}),h('b',{style:{left:'calc('+(r.likely/maxHi*100)+'% - 1px)'}})),
-        h('div.rng-l',{},fmt(r.low)+'–'+fmt(r.high))),
-      h('td',{},tag),
-      CITY_COLS.map(function(c){return h('td.num',{},fmt(cityUnits(r,c[0])));}),
-      h('td.num',{},fmt(restUnits(r))));
+function shrink(file){
+  return new Promise(function(resolve,reject){
+    var url=URL.createObjectURL(file),img=new Image();
+    img.onload=function(){
+      var m=Math.max(img.width,img.height),k=m>1024?1024/m:1,c=document.createElement('canvas');
+      c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      var data=c.toDataURL('image/jpeg',0.85);
+      resolve({url:url,colour:detectColour(img),image:{media_type:'image/jpeg',data:data.slice(data.indexOf(',')+1)}});
+    };
+    img.onerror=function(){URL.revokeObjectURL(url);reject(new Error('image'));};
+    img.src=url;
   });
-  var totCity=CITY_COLS.map(function(c){return rows.reduce(function(a,r){return a+cityUnits(r,c[0]);},0);});
-  var totRest=rows.reduce(function(a,r){return a+restUnits(r);},0);
-  trs.push(h('tr',{},h('td',{}),h('td',{}),h('td',{},h('b',{},'Total')),h('td.num',{},h('b',{},fmt(tot.likely))),h('td.meta',{},'Sum of ranges: '+fmt(tot.low)+'–'+fmt(tot.high)),h('td',{}),
-    totCity.map(function(v){return h('td.num',{},h('b',{},fmt(v)));}),h('td.num',{},h('b',{},fmt(totRest)))));
-  resultsBox.appendChild(h('div.card',{id:'results'},
-    h('h2',{},'Predicted online units, first 30 days'),
-    h('div.res-sum',{},
-      h('span',{},'Launch ',h('b',{},new Date(ctx.launch_date+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}))),
-      h('span',{},'Styles in the drop ',h('b',{},String(ctx.drop_size))),
-      h('span',{},'Store demand assumed ',h('b',{},fmt(ctx.store_units_prior28)+' units'),' in the 28 days before, from '+basis),
-      h('span',{},'Sale intensity ',h('b',{},Math.round(ctx.sale_markdown*100)+'% average markdown'))),
-    h('div.tbl-wrap',{},h('table.res',{},
-      h('thead',{},h('tr',{},h('th.num',{},'#'),h('th',{}),h('th',{},'Design'),h('th.num',{},'Likely'),h('th',{},'80% range'),h('th',{}),
-        CITY_COLS.map(function(c){return h('th.num',{},c[1]);}),h('th.num',{},'Rest of Pakistan'))),
-      h('tbody',{},trs))),
-    h('p.hint',{},'Likely = the model’s central estimate. 8 in 10 styles landed inside the range in testing. Ranks and the top/bottom 20% tags compare designs within this drop. City columns split the likely figure using how each line has sold by city since May 2025.'),
-    h('div.res-acts',{},h('button.btn.btn-line',{type:'button',onclick:downloadCsv},'Download CSV'))));
+}
+function readDesign(payload){
+  var key='';try{key=sessionStorage.getItem(KEY_SLOT)||'';}catch(e){}
+  return fetch('/api/style-rate',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-Style-Key':key},body:JSON.stringify(payload)})
+    .then(function(r){return r.json().catch(function(){return{ok:false,error:'Something went wrong. Try again.'};}).then(function(d){d._status=r.status;return d;});});
 }
 
-function downloadCsv(){
-  var byId={};S.designs.forEach(function(d){byId[d.id]=d;});
-  var cities=S.meta.cities;
-  var head=['rank','design','file','line','pieces','fabric','technique','cut','season','colour','price_rs','likely_units_30d','low_80','high_80'].concat(cities.map(function(c){return c+'_units';}));
-  var lines=[head.join(',')];
-  S.results.slice().sort(function(a,b){return a.rank-b.rank;}).forEach(function(r){
-    var d=byId[r.id];
-    var row=[r.rank,d.design,d.file,d.line,d.pieces,d.fabric,d.technique,d.cut,d.season_tag,d.colour,d.price,Math.round(r.likely),Math.round(r.low),Math.round(r.high)]
-      .concat(cities.map(function(c){return Math.round(cityUnits(r,c));}));
-    lines.push(row.map(function(v){v=String(v==null?'':v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}).join(','));
-  });
-  var a=h('a',{href:URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/csv'})),download:'ego-style-predictions-'+S.drop.launch_date+'.csv'});
-  document.body.appendChild(a);a.click();a.remove();
+/* ---------- scoring ---------- */
+var BAND=[[3000,'<3k','under Rs 3,000'],[4500,'3-4.5k','Rs 3,000–4,500'],[6000,'4.5-6k','Rs 4,500–6,000'],[8000,'6-8k','Rs 6,000–8,000'],[11000,'8-11k','Rs 8,000–11,000'],[Infinity,'11k+','above Rs 11,000']];
+function band(price){for(var i=0;i<BAND.length;i++)if(price<=BAND[i][0])return BAND[i];return BAND[BAND.length-1];}
+function salesReasons(a){
+  var ix=S.meta.index||{},out=[];
+  var add=function(attr,key,name,plural){
+    var v=(ix[attr]||{})[key];
+    if(v==null||key==='na'||key==='other')return;
+    if(v>=125)out.push({good:true,w:v/100,text:name+(plural?' sell':' sells')+' well for EGO: '+(v/100).toFixed(1)+'x the typical style’s first-month sales.'});
+    else if(v<=75)out.push({good:false,w:100/Math.max(v,1),text:name+(plural?' have':' has')+' been weak for EGO: '+(100-v)+'% below the typical style’s first-month sales.'});
+  };
+  add('line',a.line,'The '+lab(a.line)+' line');
+  add('pieces',a.pieces,lab(a.pieces).replace(' piece','-piece')+' styles',true);
+  add('technique',a.technique,lab(a.technique)+' styles',true);
+  add('fabric',a.fabric,lab(a.fabric));
+  add('colour',a.colour,lab(a.colour));
+  add('season_tag',a.season_tag,lab(a.season_tag)+' styles',true);
+  if(Number(a.price)>0){var b=band(Number(a.price));add('price_band',b[1],'Styles priced '+b[2],true);}
+  out.sort(function(x,y){return y.w-x.w;});
+  return{good:out.filter(function(r){return r.good;}).slice(0,3),bad:out.filter(function(r){return !r.good;}).slice(0,3)};
+}
+function missing(it){var m=[];if(!it.attrs.line)m.push('line');if(!(Number(it.attrs.price)>0))m.push('price');return m;}
+function score(it){
+  it.result=null;
+  if(missing(it).length)return;
+  var a=it.attrs;
+  try{
+    var r=scorer.predictBatch({single:true,launch_date:S.drop.launch_date,sale:S.drop.sale,styles:[{id:it.id,design:it.name,line:a.line,pieces:a.pieces,fabric:a.fabric,
+      technique:a.technique,cut:a.cut,season_tag:a.season_tag,colour:a.colour,price:Number(a.price),labels:a.collection?[a.collection]:[],eid:!!a.eid}]});
+    it.result=r.results[0];it.context=r.context;
+  }catch(e){it.result=null;}
+}
+/* sales score compares the design with other styles in its own line, so a strong line doesn't make every design look good */
+function salesScore(it){var sc=it.result&&it.result.score;if(!sc)return null;return sc.line!=null?sc.line:sc.all;}
+function rating(it){
+  var s=salesScore(it);
+  if(s==null)return null;
+  return it.ai?Math.round((s+it.ai.design_score)/2):s;
+}
+function grade(n){return n>=70?['Strong','good']:n>=45?['Average','mid']:['Weak','bad'];}
+
+var DEFAULTS={line:'',pieces:'na',fabric:'na',technique:'other',cut:'na',season_tag:'na',colour:'na',price:'',collection:'',eid:false};
+function buildItem(resp,local,desc){
+  var src=resp.source||{},ai=resp.ai,a=Object.assign({},DEFAULTS);
+  var put=function(o){Object.keys(o||{}).forEach(function(k){var v=o[k];if(k in a&&v!=null&&v!==''&&v!=='unknown')a[k]=v;});};
+  if(ai)put(ai.attrs);
+  put(src.attrs); /* details stated on the product page win over what the image suggests */
+  if(a.colour==='na'&&local.length&&local[0].colour)a.colour=local[0].colour;
+  if(src.price>0)a.price=src.price;else if(ai&&ai.attrs.price>0)a.price=ai.attrs.price;
+  var it={id:'d'+(++seq),name:src.title||(ai&&ai.attrs.design)||'Design '+(seq),url:src.url||'',desc:desc,
+    imgs:local.map(function(l){return l.url;}).concat(src.images||[]),attrs:a,ai:ai||null,aiError:resp.ai_error,linkError:resp.link_error,open:false};
+  score(it);
+  it.open=missing(it).length>0;
+  return it;
 }
 
-/* ---------- bar ---------- */
-function setMsg(t,type){S.msg=t;S.msgType=type||'';if(barMsg){barMsg.textContent=t;barMsg.className='bar-msg'+(type?' '+type:'');}}
-function updateBar(){
-  if(!barBtn)return;
-  var n=S.designs.length;
-  barBtn.disabled=S.busy||!n;
-  barBtn.textContent=S.busy?'Scoring…':(n?'Predict '+n+' design'+(n===1?'':'s'):'Predict');
+/* ---------- form ---------- */
+var F={url:'',desc:'',files:[]};
+var formBox,listBox,msgEl,goBtn;
+function setMsg(t,type){if(msgEl){msgEl.textContent=t||'';msgEl.className='sp-msg'+(type?' '+type:'');}}
+function addFiles(files){
+  var list=[].slice.call(files||[]).filter(function(f){return /^image\//.test(f.type);});
+  if(!list.length){setMsg('Choose image files (JPG, PNG or WebP).','err');return;}
+  F.files=F.files.concat(list).slice(0,4);
+  renderForm();
 }
-
-/* ---------- page ---------- */
-function nextMonday(){var d=new Date();d.setDate(d.getDate()+((8-d.getDay())%7||7));return d.toISOString().slice(0,10);}
-
-function render(){
-  var m=S.meta,v=m.validation;
-  app.textContent='';
+function submit(){
+  var url=F.url.trim(),desc=F.desc.trim();
+  if(!url&&!F.files.length&&!desc){setMsg('Add a product link, an image or a description.','err');return;}
+  S.busy=true;goBtn.disabled=true;goBtn.textContent='Reading the design…';setMsg('This takes up to 30 seconds.','');
+  Promise.all(F.files.map(shrink)).then(function(local){
+    return readDesign({url:url,description:desc,images:local.map(function(l){return l.image;})}).then(function(resp){
+      S.busy=false;
+      if(resp._status===401){lock();login('Sign in again to continue.');return;}
+      if(!resp.ok){local.forEach(function(l){URL.revokeObjectURL(l.url);});setMsg(resp.error||'Couldn’t read this design.','err');renderForm(true);return;}
+      S.items.unshift(buildItem(resp,local,desc));
+      F={url:'',desc:'',files:[]};
+      renderForm();renderList();
+      setMsg(resp.link_error||'',resp.link_error?'err':'');
+      listBox.firstChild&&listBox.firstChild.scrollIntoView({behavior:'smooth',block:'start'});
+    });
+  }).catch(function(){S.busy=false;setMsg('Couldn’t read this design. Check your connection and try again.','err');renderForm(true);});
+}
+function renderForm(keepMsg){
+  var prev=msgEl?[msgEl.textContent,msgEl.className]:null;
+  formBox.textContent='';
   var fileIn=h('input',{type:'file',accept:'image/*',multiple:true,onchange:function(e){addFiles(e.target.files);e.target.value='';}});
   var drop=h('label.drop',{
     ondragover:function(e){e.preventDefault();drop.classList.add('over');},
     ondragleave:function(){drop.classList.remove('over');},
     ondrop:function(e){e.preventDefault();drop.classList.remove('over');addFiles(e.dataTransfer.files);}},
-    fileIn,h('strong',{},'Drop design images here, or click to choose'),h('span',{},'Several at once, up to 60. Images stay in your browser and are only used to read the main colour.'));
-  designsBox=h('div.designs');
-  resultsBox=h('div');
-  barMsg=h('div.bar-msg'+(S.msgType?'.'+S.msgType:''),{},S.msg);
-  barBtn=h('button.btn.btn-blue',{type:'button',onclick:predict});
-  var d=S.drop;
-  app.appendChild(h('div.a-wrap.sp',{},
-    h('div.a-top',{},h('span.a-brand',{},'Vector · EGO'),
-      h('nav',{},h('button.a-link',{type:'button',onclick:function(){lock();login();}},'Sign out'))),
-    h('div.a-head',{},h('div',{},h('h1',{},'Style sales prediction'),
-      h('p.sp-sub',{},'Upload a drop’s designs and get each one’s predicted online units for its first 30 days, a likely range, its rank in the drop and a split by city.'))),
-    h('div.card',{},h('h2',{},'Drop'),h('p',{},'Applies to every design in this batch.'),
-      h('div.fields.three',{},
-        h('div.fld',{},h('label',{for:'ld'},'Launch date'),h('input',{type:'date',id:'ld',value:d.launch_date,onchange:function(e){d.launch_date=e.target.value;store('drop',d);S.results=null;markStale();}})),
-        h('div.fld',{},h('label',{for:'sale'},'Sale running in the first 30 days'),
-          sel(['auto','none','normal','heavy'],d.sale,function(val){d.sale=val;store('drop',d);S.results=null;markStale();},'sale')),
-        h('div.fld',{},h('label',{for:'oth'},'Other styles launching that week'),
-          h('input',{type:'number',id:'oth',min:'0',max:'500',value:d.other_styles,oninput:function(e){d.other_styles=Number(e.target.value)||0;store('drop',d);S.results=null;markStale();}}))),
-      h('p.hint',{},'“Auto” uses EGO’s sale calendar for the same weeks last year. Designs with the same name are treated as colourways of one design.')),
-    h('div.card',{},h('h2',{},'Designs'),drop,S.designs.length?applyAllBox():null,designsBox),
-    resultsBox,
-    h('details.trust.card',{},h('summary',{},'How far to trust these numbers'),
-      h('ul',{},
-        h('li',{},'Tested on ',h('b',{},fmt(v.styles)+' EGO styles across '+v.seasons+' seasons'),' (2023–2026), each predicted using only data from before it.'),
-        h('li',{},h('b',{},'Ranking is the strong part.'),' Rank correlation '+v.rank.toFixed(2)+'; '+Math.round(v.top20*100)+'% of predicted top-20% styles were real top-20% sellers (random picking would get 20%). EGO’s own buy quantities scored 0.40 on the same test.'),
-        h('li',{},h('b',{},'Unit numbers are rough.'),' Average error '+Math.round(v.wape*100)+'%. '+Math.round(v.coverage80*100)+'% of styles landed inside the 80% range.'),
-        h('li',{},h('b',{},'It can’t judge the print itself.'),' It knows which lines, fabrics, techniques, price points and colours sell, but within a line (unstitched especially) it can’t tell a winning print from a weak one. The image is only used to read the colour.'),
-        h('li',{},h('b',{},'Online only.'),' Shopify online store and app sales; physical stores aren’t included. City split error: about '+m.city_validation.style_mae_pts.toFixed(1)+' share points per city per style.'),
-        h('li',{},'Model trained on '+fmt(m.trained_on)+' styles, data to '+m.version+'. Use it to shortlist and size lines; make reorder calls on real sales after launch.'))),
-    h('div.bar',{},h('div.bar-in',{style:{maxWidth:'1180px'}},barMsg,h('div.bar-acts',{},barBtn)))));
-  renderDesigns();
-  renderResults();
-  updateBar();
+    fileIn,h('strong',{},'Drop images here, or click to choose'),h('span',{},'Up to 4 images of the same design.'));
+  var thumbs=F.files.length?h('div.thumbs',{},F.files.map(function(f,i){
+    var u=URL.createObjectURL(f);
+    return h('div.th',{},h('img',{src:u,alt:f.name,onload:function(){URL.revokeObjectURL(u);}}),
+      h('button',{type:'button','aria-label':'Remove '+f.name,onclick:function(){F.files.splice(i,1);renderForm();}},'×'));
+  })):null;
+  msgEl=h('div.sp-msg');
+  if(keepMsg&&prev){msgEl.textContent=prev[0];msgEl.className=prev[1];}
+  goBtn=h('button.btn.btn-blue',{type:'submit'},'Rate this design');
+  formBox.appendChild(h('form.card',{onsubmit:function(e){e.preventDefault();if(!S.busy)submit();}},
+    h('h2',{},'Rate a design'),h('p',{},'Give a product link, images, or both. Add a description for anything the page or image doesn’t show.'),
+    h('div.fld',{},h('label',{for:'u'},'Product link'),h('input',{type:'text',id:'u',inputmode:'url',placeholder:'https://wearego.com/products/…',value:F.url,oninput:function(e){F.url=e.target.value;}})),
+    h('div.fld',{},h('label',{},'Images'),drop,thumbs),
+    h('div.fld',{},h('label',{for:'ds'},'Description (optional)'),h('textarea',{id:'ds',rows:'3',placeholder:'e.g. 3-piece khaddar, digital print, Rs 4,490, winter collection',oninput:function(e){F.desc=e.target.value;}},F.desc)),
+    h('div.sp-go',{},msgEl,goBtn)));
 }
 
+/* ---------- result cards ---------- */
+function cityName(c){return c==='other'?'Rest of Pakistan':lab(c);}
+function reasons(title,cls,items){
+  if(!items.length)return null;
+  return h('div.rs.'+cls,{},h('h4',{},title),h('ul',{},items.map(function(r){return h('li',{},r.text,h('span.src',{},r.src));})));
+}
+function editor(it){
+  var o=S.meta.options,a=it.attrs;
+  var upd=function(k){return function(v){a[k]=v;score(it);renderList();};};
+  var withNone=function(list){return list.indexOf('na')>=0?list:['na'].concat(list);};
+  return h('div.sp-ed',{},
+    h('div.fields.four',{},
+      h('div.fld',{},h('label',{},'Line'),sel(a.line?o.line:[''].concat(o.line),a.line,upd('line'))),
+      h('div.fld',{},h('label',{},'Price (Rs)'),h('input',{type:'number',min:'0',step:'10',inputmode:'numeric',value:a.price,onchange:function(e){a.price=e.target.value;score(it);renderList();}})),
+      h('div.fld',{},h('label',{},'Pieces'),sel(withNone(o.pieces),a.pieces,upd('pieces'))),
+      h('div.fld',{},h('label',{},'Fabric'),sel(withNone(o.fabric),a.fabric,upd('fabric'))),
+      h('div.fld',{},h('label',{},'Technique'),sel(o.technique,a.technique,upd('technique'))),
+      h('div.fld',{},h('label',{},'Colour'),sel(withNone(o.colour),a.colour,upd('colour'))),
+      h('div.fld',{},h('label',{},'Cut'),sel(withNone(o.cut),a.cut,upd('cut'))),
+      h('div.fld',{},h('label',{},'Season'),sel(withNone(o.season_tag),a.season_tag,upd('season_tag')))),
+    h('div.fields.four',{style:{marginTop:'12px'}},
+      h('div.fld',{},h('label',{},'Launch date'),h('input',{type:'date',value:S.drop.launch_date,onchange:function(e){S.drop.launch_date=e.target.value;store('drop',S.drop);S.items.forEach(score);renderList();}})),
+      h('div.fld',{style:{gridColumn:'span 2'}},h('label',{},'Sale running in the first 30 days'),sel(['auto','none','normal','heavy'],S.drop.sale,function(v){S.drop.sale=v;store('drop',S.drop);S.items.forEach(score);renderList();}))),
+    h('p.hint',{},'Launch date and sale apply to every design on this page.'));
+}
+function card(it){
+  var r=it.result,need=missing(it),n=rating(it),a=it.attrs;
+  var img=it.imgs.length?h('img.ph',{src:it.imgs[0],alt:'',referrerpolicy:'no-referrer'}):h('div.ph.none',{},'No image');
+  var meta=[a.line?lab(a.line):null,a.pieces!=='na'?lab(a.pieces):null,a.fabric!=='na'?lab(a.fabric):null,a.technique!=='other'?lab(a.technique):null,a.colour!=='na'?lab(a.colour):null,Number(a.price)>0?'Rs '+fmt(a.price):null].filter(Boolean).join(' · ');
+  var head=h('div.rc-head',{},h('div',{},h('h3',{},it.name),h('div.meta',{},meta||'No details yet'),
+      it.url?h('a.meta',{href:it.url,target:'_blank',rel:'noopener noreferrer'},'Open product page'):null),
+    h('button.a-link',{type:'button',onclick:function(){it.imgs.forEach(function(u){if(/^blob:/.test(u))URL.revokeObjectURL(u);});S.items=S.items.filter(function(x){return x!==it;});renderList();}},'Remove'));
+  var body;
+  if(need.length){
+    body=h('div.need',{},'Add the '+need.join(' and ')+' below to get the rating. '+(need.indexOf('price')>=0?'The price wasn’t on the page or in the description.':''));
+  }else if(!r||n==null){
+    body=h('div.need',{},'Couldn’t score this design. Check the details below.');
+  }else{
+    var g=grade(n),sr=salesReasons(a);
+    var good=(it.ai?it.ai.likes.map(function(t){return{text:t,src:'Design'};}):[]).concat(sr.good.map(function(x){return{text:x.text,src:'Sales data'};}));
+    var bad=(it.ai?it.ai.dislikes.map(function(t){return{text:t,src:'Design'};}):[]).concat(sr.bad.map(function(x){return{text:x.text,src:'Sales data'};}));
+    var maxU=Math.max.apply(null,r.city.map(function(c){return c.units;}).concat([1]));
+    body=h('div',{},
+      h('div.rate',{},
+        h('div.dial.'+g[1],{},h('b',{},String(n)),h('span',{},'out of 100')),
+        h('div.rate-txt',{},h('div.verdict.'+g[1],{},g[0]),
+          it.ai?h('p',{},it.ai.verdict):null,
+          h('div.parts',{},h('span',{},'Sales history'+(r.score.line!=null?' (vs other '+lab(a.line)+' styles) ':' '),h('b',{},String(salesScore(it)))),
+            it.ai?h('span',{},'Design review ',h('b',{},String(it.ai.design_score))):null,
+            r.score.line!=null?h('span',{},'Vs all EGO launches ',h('b',{},String(r.score.all))):null))),
+      it.ai?null:h('div.note',{},it.aiError==='not_configured'?'Design review is switched off, so this rating uses sales history only and nothing here judges the look of the design.':'The design review didn’t run this time, so this rating uses sales history only. Remove and rate again to retry.'),
+      h('div.cols',{},reasons('What works','good',good),reasons('What doesn’t','bad',bad)),
+      h('h4.sp-sec',{},'Expected online units, first 30 days'),
+      h('div.units',{},h('b',{},fmt(r.likely)),h('span',{},'likely · range '+fmt(r.low)+'–'+fmt(r.high))),
+      h('div.cities',{},r.city.slice().sort(function(x,y){return (x.city==='other')-(y.city==='other')||y.units-x.units;}).map(function(c){return h('div.city',{},h('span.cn',{},cityName(c.city)),h('span.cbar',{},h('i',{style:{width:Math.max(2,c.units/maxU*100)+'%'}})),h('span.cu',{},fmt(c.units)));})));
+  }
+  var det=h('details.det',{ontoggle:function(e){it.open=e.target.open;}},h('summary',{},'Details used'),editor(it));
+  det.open=!!it.open;
+  return h('div.card.rc',{},h('div.rc-grid',{},img,h('div',{},head,body,det)));
+}
+function renderList(){
+  listBox.textContent='';
+  S.items.forEach(function(it){listBox.appendChild(card(it));});
+}
+
+/* ---------- page ---------- */
+function nextMonday(){var d=new Date();d.setDate(d.getDate()+((8-d.getDay())%7||7));return d.toISOString().slice(0,10);}
+function render(){
+  var v=S.meta.validation;
+  app.textContent='';
+  formBox=h('div');listBox=h('div.list');
+  app.appendChild(h('div.a-wrap.sp',{},
+    h('div.a-top',{},h('span.a-brand',{},'Vector · EGO'),h('nav',{},h('button.a-link',{type:'button',onclick:function(){lock();login();}},'Sign out'))),
+    h('div.a-head',{},h('div',{},h('h1',{},'Is this design good?'),
+      h('p.sp-sub',{},'Get a 0–100 rating for a design, the reasons behind it, and the units it’s likely to sell online in each city.'))),
+    formBox,listBox,
+    h('details.trust.card',{},h('summary',{},'How the rating works and how far to trust it'),
+      h('ul',{},
+        h('li',{},h('b',{},'The rating averages two scores.'),' Sales history: where the predicted units rank among launches in the same line over the last 2 years (50 = the median). Design review: Claude’s read of the image. 70+ is strong, under 45 is weak.'),
+        h('li',{},h('b',{},'Sales history is tested.'),' On '+fmt(v.styles)+' styles across '+v.seasons+' seasons it ranked styles with a correlation of '+v.rank.toFixed(2)+', and '+Math.round(v.top20*100)+'% of its top-20% picks were real top-20% sellers. It knows line, fabric, price and colour, not the print.'),
+        h('li',{},h('b',{},'The design review is an opinion.'),' It hasn’t been tested against EGO’s sales yet, so treat it as a second pair of eyes, not a forecast.'),
+        h('li',{},h('b',{},'Units are rough.'),' Average error '+Math.round(v.wape*100)+'%; '+Math.round(v.coverage80*100)+'% of styles landed inside the range. Online sales only. City split comes from how each line has sold by city since May 2025.')))));
+  renderForm();renderList();
+}
 function boot(){
   if(!scorer){
     var k=null;try{k=sessionStorage.getItem(KEY_SLOT);}catch(e){}
