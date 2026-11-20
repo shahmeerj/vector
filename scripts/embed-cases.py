@@ -22,6 +22,8 @@ css = (root / "assets/vector.css").read_text(encoding="utf-8")
 js = (root / "assets/vector.js").read_text(encoding="utf-8")
 leads = (root / "assets/leads.js").read_text(encoding="utf-8")
 icon = re.compile(r'^<link rel="icon"[^\n]*\n', re.M)
+# GTM runs once, on the landing page; overlay events reach it through leads.js.
+gtm = re.compile(r"<!-- Google Tag Manager( \(noscript\))? -->\n.*?<!-- End Google Tag Manager( \(noscript\))? -->\n", re.S)
 
 # Inside the overlay, links back to the landing page or to another case study
 # are relayed to the parent page instead of navigating the iframe.
@@ -38,6 +40,7 @@ def embeddable(html: str) -> str:
     """The overlay iframe uses srcdoc, so shared assets are inlined and the
     favicon is dropped (the parent page sets it)."""
     html = icon.sub("", html, count=1)
+    html = gtm.sub("", html)
     html = html.replace('<link rel="stylesheet" href="assets/vector.css">', "<style>" + css + "</style>" + BRIDGE, 1)
     html = html.replace('<script src="assets/leads.js"></script>', "<script>" + leads + "</script>", 1)
     html = html.replace('<script src="assets/vector.js"></script>', "<script>" + js + "</script>", 1)

@@ -1,3 +1,21 @@
+/* Analytics events for Google Tag Manager (see README → Tracking).
+   Inside a case-study overlay (an about:srcdoc iframe on the landing page) the
+   events go to the landing page's dataLayer, so GTM only runs once. */
+(function(){
+"use strict";
+var overlay=location.protocol==='about:'&&window.parent!==window;
+function push(o){try{var w=overlay?window.parent:window;(w.dataLayer=w.dataLayer||[]).push(o);}catch(e){}}
+var cs=location.pathname.match(/\/(tamba|personology|routines)(?:\.html)?$/);
+if(cs&&!overlay)push({event:'case_study_view',case_study:cs[1],view_type:'page'});
+window.addEventListener('click',function(e){
+  var a=e.target.closest&&e.target.closest('a[href$="#call"],a[href$="#book"]');if(!a)return;
+  var id=a.dataset.cta||(a.textContent||'').trim().replace(/\s+/g,' ').slice(0,60);
+  if(!id)return; /* the overlay's synthetic scroll link: already counted inside the overlay */
+  var pg=overlay?'overlay:'+((document.title||'').split(' ')[0].toLowerCase()||'case'):location.pathname;
+  push({event:'book_call_click',cta_id:id,cta_page:pg});
+},true);
+})();
+
 /* Lead attribution: remembers how a visitor first arrived and which
    "book a call" link they clicked, so /api/lead can record it with the form. */
 (function(){

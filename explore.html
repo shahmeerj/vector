@@ -2,6 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<!-- Google Tag Manager -->
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+/* Consent defaults: off in the EEA, UK and Switzerland (no consent banner yet); a Global Privacy Control signal turns off advertising use everywhere. */
+(function(){var g=navigator.globalPrivacyControl===true?'denied':'granted';
+gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',region:['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE','IS','LI','NO','GB','CH']});
+gtag('consent','default',{ad_storage:g,ad_user_data:g,ad_personalization:g,analytics_storage:'granted'});})();
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-5HTP7QW4');</script>
+<!-- End Google Tag Manager -->
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Explore Vector</title>
 <meta name="description" content="Step inside Vector's hall: a first-person tavern where you can meet the team, read our deeds by torchlight and book a call. Performance marketing for B2B software in the US and Canada.">
@@ -196,6 +204,9 @@ body.touch .prompt{pointer-events:auto;cursor:pointer;top:auto;bottom:calc(env(s
 </style>
 </head>
 <body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5HTP7QW4" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 
 <canvas id="scene" tabindex="0" aria-label="A first-person tavern room. Walk around and talk to the three people inside to learn about Vector."></canvas>
 
@@ -394,7 +405,7 @@ function freeCursor(){ if(document.pointerLockElement) try{document.exitPointerL
 function openText(){ freeCursor(); $('textview').hidden=false; ui.text=true; hideIntro(true); closeDialogue(); $('textview').scrollTop=0; refreshHud(); }
 function closeText(){ $('textview').hidden=true; ui.text=false; if(hooks.enter&&!hooks.entered) $('intro').hidden=false; $('scene').focus(); refreshHud(); }
 let lastFocus=null;
-function openBooking(){ freeCursor(); lastFocus=document.activeElement; closeDialogue(); hideIntro(); $('booking').hidden=false; ui.modal=true;
+function openBooking(){ (window.dataLayer=window.dataLayer||[]).push({event:'book_call_click',cta_id:'explore-book',cta_page:location.pathname}); freeCursor(); lastFocus=document.activeElement; closeDialogue(); hideIntro(); $('booking').hidden=false; ui.modal=true;
   $('bookForm').hidden=false; $('bookDone').hidden=true; $('formErr').hidden=true;
   bookCourier=!!(hooks.open&&hooks.open());
   $('bookLede').textContent=bookCourier?'Pip the courier is coming over to carry your letter in. Leave your details and we\u2019ll reply with a time for a short call.':'Leave your details. We\u2019ll look at your market before the call and tell you plainly whether we can help.';
@@ -427,7 +438,7 @@ $('form').addEventListener('submit',e=>{
       sending=false; btn.disabled=false; btn.textContent=label;
       if(d&&d.errors){ const k=Object.keys(d.errors)[0]; return fail(d.errors[k],$({name:'f-name',email:'f-email',website:'f-company'}[k]||'f-name')); }
       if(!ok||!d||!d.ok) return fail('Something went wrong on our side. Please try again in a moment.');
-      if(window.gtag) gtag('event','generate_lead',{method:'explore_form'});
+      (window.dataLayer=window.dataLayer||[]).push({event:'generate_lead',form_id:'explore_form',cta_id:lead.cta,cta_page:lead.cta_page});
       if(hooks.submit) hooks.submit();
       $('doneTitle').textContent=bookCourier?'Pip has your letter.':'Your name is in the ledger.';
       $('doneMsg').textContent='Thanks, '+name.split(' ')[0]+'. '+(bookCourier?'Pip is taking your letter in now. ':'')+'We’ll reply to '+email+' with a few times for a call.';
