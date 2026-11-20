@@ -177,6 +177,7 @@ form.addEventListener('submit',function(e){
   }).then(function(res){
     form.classList.remove('busy');btnText.textContent='Send application';
     if(res.data.ok){
+      (window.dataLayer=window.dataLayer||[]).push({event:'job_application',job_id:form.dataset.job||''});
       document.getElementById('applyName').textContent=val('name').split(/\s+/)[0];
       form.hidden=true;
       var done=document.getElementById('applyDone');done.hidden=false;done.focus({preventScroll:true});

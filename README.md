@@ -75,6 +75,30 @@ site? · CTA clicked · CTA page · Form page · Landing page · Referrer · utm
 gclid · li_fat_id · Country · Region · City · Timezone · IP · User agent ·
 Status (starts as `New`) · Notes (flags repeat submissions)
 
+## Tracking (Google Tag Manager)
+
+Container `GTM-5HTP7QW4` loads on every public page (landing page, `/audit`,
+`/explore`, `/privacy`, the case studies and the careers pages via
+`lib/careers-page.js`). Not on `/admin` or `/style-prediction-model`. Tags,
+triggers and the GA4 setup live in GTM; the site only pushes events to
+`dataLayer`:
+
+| Event | When | Parameters |
+|---|---|---|
+| `generate_lead` | a booking form is accepted by `/api/lead` | `form_id` (`request_call`, `audit_form`, `explore_form`), `cta_id`, `cta_page` |
+| `book_call_click` | a "Book a call" / "Book your audit" link is clicked (`#call`, `#book`), or the booking form opens on `/explore` | `cta_id`, `cta_page` |
+| `case_study_view` | a case study opens as an overlay or as its own page | `case_study`, `view_type` (`overlay`, `page`) |
+| `job_application` | a careers application is accepted by `/api/apply` | `job_id` |
+
+The case-study overlays don't load GTM themselves: `scripts/embed-cases.py`
+strips the snippet from the embedded copies, and `assets/leads.js` sends
+overlay events to the landing page's `dataLayer`.
+
+Consent defaults are set in the snippet before GTM loads: analytics and ad
+storage are denied in the EEA, UK and Switzerland (there's no consent banner),
+and a Global Privacy Control signal denies ad storage everywhere. Add a consent
+banner before running ads aimed at Europe.
+
 ## Careers
 
 `/careers` has a short intro, an About Vector section and the open roles.
